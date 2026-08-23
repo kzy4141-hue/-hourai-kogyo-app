@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>宝来工業アプリ</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Yu Gothic",sans-serif;background:#f3f5f7;color:#1f2937}
+header{height:60px;background:linear-gradient(135deg,#172033,#263b63);color:#fff;display:flex;align-items:center;padding:0 18px;font-weight:700;font-size:20px;gap:10px;box-shadow:0 2px 10px rgba(15,23,42,.18)}header img{height:42px;width:42px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
+nav{position:fixed;top:60px;left:0;bottom:0;width:210px;background:#182235;border-right:1px solid #0f172a;padding:12px 10px;overflow:auto}
+nav button{width:100%;padding:11px 12px;text-align:left;background:transparent;color:#dbe4f1;border:0;border-radius:8px;margin:2px 0;cursor:pointer;font-size:14px;transition:.15s}
+nav button:hover{background:#263856;color:#fff;transform:translateX(2px)}
+main{margin-left:210px;padding:22px;max-width:1600px}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,23,42,.04)}h2{margin-top:0;margin-bottom:16px;color:#203653;border-left:5px solid #d18a2c;padding-left:10px}h3{margin-top:0;color:#2a3d59}
+.primary{background:linear-gradient(135deg,#d18a2c,#b86e14);color:#fff;border:0;padding:10px 15px;border-radius:8px;cursor:pointer;min-height:40px;font-weight:700;box-shadow:0 2px 5px rgba(184,110,20,.22)}
+.secondary{background:#e8edf4;color:#26364f;border:0;padding:10px 15px;border-radius:8px;cursor:pointer;min-height:40px;font-weight:600}
+.danger{background:#b42318;color:#fff;border:0;padding:9px 14px;border-radius:8px;cursor:pointer}
+.small{padding:6px 9px;border:0;border-radius:5px;cursor:pointer}
+.small.edit{background:#eef2f7}.small.del{background:#dc2626;color:#fff}
+.table-wrap{width:100%;overflow-x:auto;margin-top:12px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+th,td{border-bottom:1px solid #e5e7eb;padding:6px 7px;text-align:left;vertical-align:middle;line-height:1.25;overflow-wrap:anywhere;word-break:break-word}
+th{background:linear-gradient(180deg,#edf2f7,#e4eaf1);color:#243449;white-space:normal;font-size:12px;font-weight:700;position:sticky;top:0;z-index:1;border-bottom:2px solid #c9d4e2}
+tbody tr:nth-child(even){background:#fbfcfe}
+tbody tr:hover{background:#fff7ea}
+td{font-size:12.5px}
+td:last-child,th:last-child{white-space:nowrap}
+.action-cell{width:118px;white-space:nowrap}.employee-name{white-space:nowrap;overflow:visible;text-overflow:clip;max-width:none;width:auto}
+
+.small{padding:5px 8px;font-size:12px;margin:1px 0}
+.small.edit{background:#e7eef8;color:#244467}.small.del{background:#fbe4e2;color:#a33a2d}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:100}
+.modal.show{display:flex}
+.box{background:#fff;width:620px;max-width:94vw;max-height:92vh;overflow:auto;border-radius:10px;padding:20px}
+.close{float:right;border:0;background:#eee;padding:7px 10px;border-radius:6px;cursor:pointer}
+input,select,textarea{width:100%;padding:10px;margin-top:5px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;transition:.15s}input:focus,select:focus,textarea:focus{outline:none;border-color:#d18a2c;box-shadow:0 0 0 3px rgba(209,138,44,.14)}
+textarea{min-height:80px;resize:vertical}
+label{display:block;margin-bottom:10px;font-size:13px;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dash-card{background:linear-gradient(145deg,#fff,#f8fafc);border:1px solid #dce4ee;border-radius:12px;padding:16px;box-shadow:0 3px 10px rgba(15,23,42,.05);position:relative;overflow:hidden;cursor:pointer;transition:.15s}.dash-card:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(15,23,42,.09);border-color:#d18a2c}
+.dash-label{font-size:13px;color:#64748b}.dash-value{font-size:28px;font-weight:800;margin-top:6px;color:#203653}.dash-card:after{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(#d18a2c,#e2b15b)}
+.notice{background:linear-gradient(90deg,#fff8ec,#f8fafc);border-left:4px solid #d18a2c;padding:11px 13px;margin:10px 0;font-size:13px;color:#475569;border-radius:0 8px 8px 0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.search-box{display:flex;gap:8px;align-items:center;margin:10px 0 12px}.search-box input{margin:0;max-width:420px}.search-box select{margin:0;max-width:100%}
+.qualification-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;max-height:220px;overflow:auto}
+.qualification-chip{border:1px solid #cbd5e1;background:#fff;color:#222;padding:8px 10px;border-radius:18px;cursor:pointer;font-size:13px}
+.qualification-chip.selected{background:#2563eb;color:#fff;border-color:#2563eb}
+.hint{font-size:12px;color:#64748b;margin-top:4px}.alert-item{padding:9px 10px;border-radius:8px;margin:6px 0;font-size:13px}.alert-danger{background:#fff1f1;color:#991b1b;border-left:4px solid #dc2626}.alert-warn{background:#fff8e8;color:#8a5a00;border-left:4px solid #d18a2c}.alert-ok{background:#eff8f0;color:#276749;border-left:4px solid #3a9d5d}
+.empty{color:#64748b;padding:12px 0}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:750px){nav{display:none}main{margin-left:0;padding:12px}.row{grid-template-columns:1fr}.box{width:96vw}.dashboard-grid{grid-template-columns:1fr 1fr}}
+
+@media(max-width:1100px){
+  #sites th:nth-child(4),#sites td:nth-child(4){display:none}
+  #partners th:nth-child(4),#partners td:nth-child(4){display:none}
+  #employees th:nth-child(7),#employees td:nth-child(7){display:none}
+  #employees th:nth-child(8),#employees td:nth-child(8){display:none}
+  #vehicles th:nth-child(5),#vehicles td:nth-child(5){display:none}
+  #vehicles th:nth-child(7),#vehicles td:nth-child(7){display:none}
+}
+@media(max-width:800px){
+  .table-wrap{overflow-x:visible;border:0}
+  table{min-width:0}
+  th,td{padding:6px 5px;font-size:12px}
+  .small{padding:4px 7px;font-size:11.5px}
+  .action-cell{width:96px}
+  #sites th:nth-child(3),#sites td:nth-child(3){display:none}
+  #partners th:nth-child(3),#partners td:nth-child(3){display:none}
+  #employees th:nth-child(4),#employees td:nth-child(4){display:none}
+  #employees th:nth-child(5),#employees td:nth-child(5){display:none}
+  #vehicles th:nth-child(3),#vehicles td:nth-child(3){display:none}
+  #vehicles th:nth-child(4),#vehicles td:nth-child(4){display:none}
+  #items th:nth-child(5),#items td:nth-child(5){display:none}
+  #items th:nth-child(6),#items td:nth-child(6){display:none}
+  #sales th:nth-child(3),#sales td:nth-child(3){display:none}
+}
+
+
+nav button{display:flex;align-items:center;gap:9px}
+nav .menu-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex:0 0 24px;font-size:16px}
+nav .menu-icon img{width:22px;height:22px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
+
+
+.sales-group-title{font-weight:700;color:#263b63}
+
+#employees table{table-layout:auto}
+.employee-furigana{font-size:10px;color:#64748b;line-height:1.1;white-space:nowrap}
+
+#qualOwnerSearch{width:100%;min-width:420px;max-width:100%;white-space:nowrap}
+#qualOwners .search-box{width:100%}
+#qualOwners .search-box select:first-child{width:100%;min-width:420px}
+@media(max-width:700px){
+  #qualOwnerSearch,#qualOwners .search-box select:first-child{min-width:0;width:100%}
+}
+
+.individual-badge{display:inline-block;margin-left:5px;padding:1px 5px;border-radius:9px;background:#fff1d6;color:#8a5a00;font-size:10px;font-weight:700;white-space:nowrap}
+#listDetailModal.show{display:flex;align-items:center;justify-content:center}
+
+/* 現場管理：指定項目を一行表示 */
+#sites table{table-layout:auto}
+#sites th:first-child,#sites td:first-child,
+#sites th:nth-child(3),#sites td:nth-child(3),
+#sites th:nth-child(7),#sites td:nth-child(7),
+#sites th:nth-child(8),#sites td:nth-child(8){
+  white-space:nowrap;
+  overflow:visible;
+  text-overflow:clip;
+  word-break:keep-all;
+  overflow-wrap:normal;
+}
+
+
+/* 印刷対応 */
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff;color:#000}
+  header{position:static;height:48px;background:#fff;color:#000;box-shadow:none;border-bottom:1px solid #999}
+  header img{display:none}
+  nav{display:none!important}
+  main{margin-left:0;padding:10px;max-width:none}
+  .screen{display:none!important}
+  .screen.active{display:block!important}
+  .card{box-shadow:none;border:1px solid #999;break-inside:avoid}
+  .toolbar,.search-box,.notice,.primary,.secondary,.danger,.small,.action-cell,
+  button,.close{display:none!important}
+  h2{color:#000;border-left:4px solid #000}
+  table{width:100%!important;table-layout:auto!important}
+  th{background:#eee!important;color:#000!important;position:static!important}
+  th,td{font-size:10pt;padding:4px;border-bottom:1px solid #999}
+  .table-wrap{overflow:visible!important;border:0}
+  a{color:#000;text-decoration:none}
+  .dash-card{box-shadow:none}
+}
+
+/* 画面上の印刷ボタン */
+.print-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.print-button{background:#334155;color:#fff;border:0;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:700}
+@media print{.print-toolbar{display:none!important}}
+
+</style>
+<!-- 2026-08-23 エラー修正版: 一覧参照番号・検索API・宿泊先削除・CSV列整合を修正 -->
+</head>
+<body>
+<header><img src="data:image/jpeg;base64,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" alt="宝来工業ロゴ"><span>宝来工業アプリ</span></header>
+
+<nav>
+<button onclick="App.show('home')"><span class="menu-icon">🏠</span><span>ホーム</span></button>
+<button onclick="App.show('clients')"><span class="menu-icon">🏢</span><span>元請会社</span></button>
+<button onclick="App.show('sites')"><span class="menu-icon">🏗️</span><span>現場管理</span></button>
+<button onclick="App.show('partners')"><span class="menu-icon">🤝</span><span>協力会社</span></button>
+<button onclick="App.show('contacts')"><span class="menu-icon">👤</span><span>担当者</span></button>
+<button onclick="App.show('employees')"><span class="menu-icon">👷</span><span>社員管理</span></button>
+<button onclick="App.show('qualifications')"><span class="menu-icon">📜</span><span>資格・免許</span></button>
+<button onclick="App.show('qualOwners')"><span class="menu-icon">🔎</span><span>資格所有者検索</span></button>
+<button onclick="App.show('stayers')"><span class="menu-icon">🏨</span><span>宿泊者一覧</span></button>
+<button onclick="App.show('lodgingPlaces')"><span class="menu-icon">🛏️</span><span>宿泊先管理</span></button>
+<button onclick="App.show('vehicles')"><span class="menu-icon">🚚</span><span>車両</span></button>
+<button onclick="App.show('items')"><span class="menu-icon">📦</span><span>購入物品</span></button>
+<button onclick="App.show('sales')"><span class="menu-icon">💴</span><span>請求</span></button>
+<button onclick="App.show('backup')"><span class="menu-icon">💾</span><span>バックアップ</span></button>
+<button onclick="App.show('export')"><span class="menu-icon">📊</span><span>Excel出力</span></button>
+</nav>
+
+<main>
+<div class="print-toolbar"><button class="print-button" onclick="window.print()">🖨️ 印刷</button></div>
+<section id="home" class="screen active">
+<h2>ホーム</h2>
+<div class="card" style="background:linear-gradient(135deg,#fffaf0,#ffffff);border-left:5px solid #d18a2c">
+<h3 style="margin-bottom:10px">クイック登録</h3>
+<div class="toolbar">
+<button class="primary" onclick="App.open('employee')">👷 社員登録</button>
+<button class="primary" onclick="App.open('sales')">🧾 請求登録</button>
+<button class="primary" onclick="App.open('item')">📦 購入物品登録</button>
+</div>
+</div>
+<div class="card">
+<h3>最近の登録・更新</h3>
+<div id="recentActivity"></div>
+</div>
+<div class="card">
+<h3>期限アラート</h3><div class="hint">車検・任意保険・資格の有効期限が30日以内になると表示します。期限切れも表示します。</div>
+<div id="expiryAlerts"></div>
+</div>
+<div class="dashboard-grid">
+<div class="dash-card" onclick="App.homeDetail('employees')" title="社員一覧を表示"><div class="dash-label">全作業員数</div><div class="dash-value" id="dashTotalWorkers">0人</div></div>
+<div class="dash-card" onclick="App.homeDetail('ownEmployees')" title="自社社員一覧を表示"><div class="dash-label">自社社員</div><div class="dash-value" id="dashOwnWorkers">0人</div></div>
+<div class="dash-card" onclick="App.homeDetail('partnerEmployees')" title="協力会社社員一覧を表示"><div class="dash-label">協力会社社員</div><div class="dash-value" id="dashPartnerWorkers">0人</div></div>
+<div class="dash-card" onclick="App.homeDetail('sites')" title="現場一覧を表示"><div class="dash-label">現場数</div><div class="dash-value" id="dashSites">0件</div></div>
+<div class="dash-card" onclick="App.homeDetail('vehicles')" title="車両一覧を表示"><div class="dash-label">車両台数</div><div class="dash-value" id="dashVehicles">0台</div></div>
+<div class="dash-card" onclick="App.homeDetail('sales')" title="今月の売上を表示"><div class="dash-label">今月請求額</div><div class="dash-value" id="dashSales">0円</div></div>
+<div class="dash-card" onclick="App.homeDetail('expenses')" title="今月の経費を表示"><div class="dash-label">今月経費</div><div class="dash-value" id="dashExpense">0円</div></div>
+<div class="dash-card" onclick="App.homeDetail('profit')" title="今月の利益を表示"><div class="dash-label">今月利益</div><div class="dash-value" id="dashProfit">0円</div></div>
+</div>
+<div class="card"><h3>現場別作業員数</h3><div id="dashSiteWorkers" class="empty">現場がありません。</div></div><div class="card">
+<h3>現場別人件費・宿泊費</h3>
+<div id="dashSiteCosts" class="empty">現場がありません。</div>
+</div>
+</section>
+
+<section id="sites" class="screen">
+<h2>現場管理</h2><div class="notice">登録した作業員人数・出張単価・宿泊先の宿泊経費から現場ごとの金額を自動計算します。人件費は1日分のみ、宿泊費は「宿泊：あり」の社員だけを計上します。登録済み宿泊先の経費を優先し、未登録・都度入力の場合は現場の基準宿泊費を使用します。</div>
+<button class="primary" onclick="App.open('site')">＋ 現場を新規登録</button>
+<div class="search-box">
+<select id="siteSearchField" onchange="App.updateSiteSearchOptions()">
+<option value="site">現場名</option><option value="client">元請会社</option><option value="no">工事番号</option>
+</select>
+<select id="siteSearch" onchange="App.applySiteSearch()"><option value="">すべて</option></select>
+<button class="secondary" onclick="App.clearSearch('site')">クリア</button>
+</div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>現場名</th><th>工事番号</th><th>元請会社</th><th>担当者</th><th>作業員人数</th><th>区分</th><th>地元単価</th><th>出張単価</th><th>宿泊費</th><th class="action-cell">操作</th></tr></thead><tbody id="siteBody"></tbody></table></div></div>
+</section>
+
+<section id="clients" class="screen">
+<h2>元請会社</h2>
+<button class="primary" onclick="App.open('client')">＋ 元請会社を登録</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>会社名</th><th>電話番号</th><th>住所</th><th>メール</th><th class="action-cell">操作</th></tr></thead><tbody id="clientBody"></tbody></table></div></div>
+</section>
+
+<section id="partners" class="screen">
+<h2>協力会社</h2>
+<button class="primary" onclick="App.open('partner')">＋ 協力会社を登録</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>会社名</th><th>電話番号</th><th>住所</th><th>メール</th><th>主な業種</th><th>地元支払い</th><th>出張支払い</th><th class="action-cell">操作</th></tr></thead><tbody id="partnerBody"></tbody></table></div></div>
+</section>
+
+<section id="contacts" class="screen">
+<h2>担当者</h2>
+<button class="primary" onclick="App.open('contact')">＋ 担当者を登録</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>担当者名</th><th>電話番号</th><th>メール</th><th>備考</th><th class="action-cell">操作</th></tr></thead><tbody id="contactBody"></tbody></table></div></div>
+</section>
+
+<section id="employees" class="screen">
+<h2>社員管理</h2>
+<button class="primary" onclick="App.open('employee')">＋ 社員を登録</button>
+<div class="search-box"><input id="employeeSearch" type="search" placeholder="氏名・所属会社・区分で検索"><select id="employeeSearchType"><option value="all">すべて</option><option value="自社社員">自社社員</option><option value="協力会社社員">協力会社社員</option></select><button class="secondary" onclick="App.clearSearch('employee')">クリア</button></div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>区分</th><th>所属会社</th><th>氏名</th><th>現場名</th><th>支払い経費</th><th>生年月日</th><th>年齢</th><th>宿泊</th><th>県</th><th>備考</th><th class="action-cell">操作</th></tr></thead><tbody id="employeeBody"></tbody></table></div></div>
+</section>
+
+<section id="qualifications" class="screen">
+<h2>資格・免許</h2>
+<div class="notice">建設・安全衛生関係を中心に初期資格を登録しています。区分は「特別教育・技能講習・免許」です。不要な資格は削除、会社独自の資格は追加できます。</div>
+<button class="primary" onclick="App.open('qualification')">＋ 資格・免許を登録</button>
+<button class="secondary" onclick="App.addDefaults()">初期資格を追加</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>資格・免許名</th><th>区分</th><th class="action-cell">操作</th></tr></thead><tbody id="qualificationBody"></tbody></table></div></div>
+</section>
+
+<section id="qualOwners" class="screen">
+<h2>資格所有者検索</h2>
+<div class="notice">資格を選ぶと、その資格を登録している社員だけを表示します。</div>
+<div class="search-box">
+<select id="qualOwnerSearch" onchange="App.searchQualificationOwners()">
+<option value="">資格を選択してください</option>
+</select>
+<button class="secondary" onclick="App.clearQualificationOwnerSearch()">クリア</button>
+</div>
+<div class="card">
+<div id="qualOwnerResultCount" class="hint" style="margin-bottom:8px"></div><div class="hint" style="margin-bottom:8px">社員名の行をクリックすると詳細を表示します。</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>氏名</th><th>ふりがな</th><th>所属会社</th><th>区分</th><th>現場名</th><th>支払い経費</th><th>宿泊</th><th>有効期限</th><th class="action-cell">操作</th></tr></thead>
+<tbody id="qualOwnerBody"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="stayers" class="screen">
+<h2>宿泊者一覧</h2>
+<div class="notice">社員管理で「宿泊：あり」に設定した社員だけを表示します。</div>
+<div class="card">
+<div id="stayerResultCount" class="hint" style="margin-bottom:8px"></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>氏名</th><th>ふりがな</th><th>所属会社</th><th>区分</th><th>現場名</th><th>県</th><th>支払い経費</th><th>宿泊</th><th>宿泊先</th><th class="action-cell">操作</th></tr></thead>
+<tbody id="stayerBody"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="lodgingPlaces" class="screen">
+<h2>宿泊先管理</h2>
+<button class="primary" onclick="App.open('lodgingPlace')">＋ 宿泊先を登録</button>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>宿泊先名</th><th>住所</th><th>電話番号</th><th>宿泊経費</th><th>備考</th><th class="action-cell">操作</th></tr></thead>
+<tbody id="lodgingPlaceBody"></tbody></table>
+</div>
+</div>
+</section>
+
+<section id="vehicles" class="screen">
+<h2>車両管理</h2>
+<button class="primary" onclick="App.open('vehicle')">＋ 車両を登録</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>車両名</th><th>ナンバー</th><th>車検</th><th>任意保険</th><th>整備履歴</th><th>修理・維持費</th><th>備考</th><th class="action-cell">操作</th></tr></thead><tbody id="vehicleBody"></tbody></table></div></div>
+</section>
+
+<section id="items" class="screen">
+<h2>購入物品</h2>
+<button class="primary" onclick="App.open('item')">＋ 購入物品を登録</button>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>品名</th><th>個数</th><th>金額</th><th>現場名</th><th>購入日</th><th>備考</th><th class="action-cell">操作</th></tr></thead><tbody id="itemBody"></tbody></table></div></div>
+</section>
+
+<section id="sales" class="screen">
+<h2>請求</h2>
+<button class="primary" onclick="App.open('sales')">＋ 請求を登録</button>
+<div class="search-box">
+<select id="salesSearchField" onchange="App.updateSalesSearchOptions()">
+<option value="site">現場名</option><option value="client">元請会社</option>
+</select>
+<select id="salesSearch" onchange="App.applySalesSearch()"><option value="">すべて</option></select>
+<button class="secondary" onclick="App.clearSearch('sales')">クリア</button>
+</div>
+<div class="notice">元請会社ごとにまとめ、その中を現場ごとに分けて表示します。</div>
+<div id="salesGroupedBody"></div>
+</section>
+
+
+<section id="export" class="screen">
+<div class="card" style="border:2px solid #2563eb">
+<h3 style="margin-top:0">一括出力</h3>
+<p style="margin:6px 0;color:#475569">会社の全データを1つのCSVファイルにまとめて出力します。Excel 2019でそのまま開けます。</p>
+<button class="primary" onclick="App.exportAll()">全データを1ファイルに一括出力</button>
+</div>
+
+<h2>Excel出力</h2>
+<div class="notice">一括出力なら、現場・社員・協力会社などを1つのファイルにまとめて保存できます。</div>
+<div class="notice">Excel 2019で開けるCSV形式で出力します。文字化け防止のためUTF-8 BOM付きで保存します。</div>
+<div class="toolbar">
+<button class="primary" onclick="App.exportCsv('sites')">現場一覧をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('employees')">社員名簿をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('partners')">協力会社をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('clients')">元請会社をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('contacts')">担当者をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('qualifications')">資格一覧をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('vehicles')">車両一覧をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('items')">購入物品をExcel出力</button>
+<button class="primary" onclick="App.exportCsv('sales')">請求をExcel出力</button>
+</div>
+<div class="card">
+<h3>おすすめ</h3>
+<div class="hint">Excelで一覧を編集したい場合は、CSVをExcel 2019で開いてください。</div>
+</div>
+</section>
+
+<section id="backup" class="screen">
+<h2>バックアップ</h2>
+<div class="notice">データはこのパソコンのブラウザ内に保存されます。大切なデータは定期的にバックアップしてください。</div>
+<div class="toolbar">
+<button class="primary" onclick="App.backup()">バックアップ保存</button>
+<button class="secondary" onclick="document.getElementById('restoreFile').click()">バックアップ復元</button>
+<input id="restoreFile" type="file" accept=".json" style="display:none" onchange="App.restore(this)">
+</div>
+<div class="card"><b>現在のデータ件数</b><div id="backupStatus" style="margin-top:8px"></div></div>
+</section>
+</main>
+
+<!-- MODALS -->
+<div class="modal" id="clientModal"><div class="box"><button class="close" onclick="App.close('client')">閉じる</button><h3 id="clientTitle">元請会社登録</h3>
+<label>会社名<input id="clientName"></label><label>電話番号<input id="clientPhone"></label><label>住所<input id="clientAddress"></label><label>メール<input id="clientEmail"></label>
+<button class="primary" onclick="App.save('client')">保存</button> <button class="danger" id="clientFormDelete" onclick="App.deleteFromForm('client')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="partnerModal"><div class="box"><button class="close" onclick="App.close('partner')">閉じる</button><h3 id="partnerTitle">協力会社登録</h3>
+<label>会社名<input id="partnerName"></label><label>電話番号<input id="partnerPhone"></label><label>住所<input id="partnerAddress"></label><label>メール<input id="partnerEmail"></label><label>主な業種・仕事内容<input id="partnerWork"></label><div class="hint">所属社員の支払い経費は、現場区分が地元なら地元支払い経費、出張なら出張支払い経費を自動使用します。</div><div class="row"><label>地元支払い経費<input id="partnerLocalCost" type="number" min="0" placeholder="円"></label><label>出張支払い経費<input id="partnerTravelCost" type="number" min="0" placeholder="円"></label></div>
+<button class="primary" onclick="App.save('partner')">保存</button> <button class="danger" id="partnerFormDelete" onclick="App.deleteFromForm('partner')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="contactModal"><div class="box"><button class="close" onclick="App.close('contact')">閉じる</button><h3 id="contactTitle">担当者登録</h3>
+<label>担当者名<input id="contactName"></label><label>電話番号<input id="contactPhone"></label><label>メール<input id="contactEmail"></label><label>備考<textarea id="contactMemo"></textarea></label>
+<button class="primary" onclick="App.save('contact')">保存</button> <button class="danger" id="contactFormDelete" onclick="App.deleteFromForm('contact')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="vehicleModal"><div class="box"><button class="close" onclick="App.close('vehicle')">閉じる</button><h3 id="vehicleTitle">車両登録</h3>
+<div class="row"><label>車両名<input id="vehicleName"></label><label>ナンバー<input id="vehicleNumber"></label></div>
+<div class="row"><label>車検<input id="vehicleInspection" type="date"></label><label>任意保険<input id="vehicleInsurance" type="date"></label></div>
+<label>整備履歴<textarea id="vehicleService"></textarea></label><label>修理・維持費<input id="vehicleCost" type="number" min="0"></label><label>備考<textarea id="vehicleMemo"></textarea></label>
+<button class="primary" onclick="App.save('vehicle')">保存</button> <button class="danger" id="vehicleFormDelete" onclick="App.deleteFromForm('vehicle')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="qualificationModal"><div class="box"><button class="close" onclick="App.close('qualification')">閉じる</button><h3 id="qualificationTitle">資格・免許登録</h3>
+<label>資格・免許名<input id="qualificationName"></label>
+<label>区分<select id="qualificationType"><option>特別教育</option><option>技能講習</option><option>免許</option></select></label>
+<button class="primary" onclick="App.save('qualification')">保存</button> <button class="danger" id="qualificationFormDelete" onclick="App.deleteFromForm('qualification')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="lodgingPlaceModal"><div class="box"><button class="close" onclick="App.close('lodgingPlace')">閉じる</button><h3 id="lodgingPlaceTitle">宿泊先登録</h3>
+<label>宿泊先名<input id="lodgingPlaceName" placeholder="例：○○ホテル"></label>
+<label>住所<input id="lodgingPlaceAddress"></label>
+<div class="row"><label>電話番号<input id="lodgingPlacePhone"></label><label>宿泊経費<input id="lodgingPlaceCost" type="number" min="0" placeholder="円"></label></div>
+<label>備考<textarea id="lodgingPlaceMemo"></textarea></label>
+<button class="primary" onclick="App.save('lodgingPlace')">保存</button> <button class="danger" id="lodgingPlaceFormDelete" onclick="App.deleteFromForm('lodgingPlace')" style="display:none">削除</button>
+</div></div>
+
+<div class="modal" id="employeeModal"><div class="box"><button class="close" onclick="App.close('employee')">閉じる</button><h3 id="employeeTitle">社員登録</h3>
+<label>区分<select id="employeeType"><option value="自社社員">自社社員</option><option value="協力会社社員">協力会社社員</option></select></label>
+<label>所属会社<select id="employeeCompany"><option value="">選択してください</option></select></label>
+<div class="row">
+<label>支払い経費設定<select id="employeeCostMode"><option value="company">会社設定</option><option value="individual">個別設定</option></select></label>
+<label>支払い経費<input id="employeeCost" type="number" min="0" placeholder="協力会社の設定額を自動反映"></label>
+</div>
+<div class="hint">協力会社社員は通常、所属会社の支払い経費を使用します。例外の場合だけ「個別設定」を選んでください。</div>
+<div class="row"><label>氏名<input id="employeeName"></label><label>ふりがな<input id="employeeFurigana" placeholder="例：やまだ たろう"></label></div>
+<div class="row"><label>生年月日<input id="employeeBirth" type="date"></label><label>年齢<input id="employeeAge" readonly></label></div>
+<div class="row">
+<label>宿泊<select id="employeeStay"><option value="なし">なし</option><option value="あり">あり</option></select></label>
+<label>宿泊先の入力方法<select id="employeeLodgingMode"><option value="registered">登録済みから選択</option><option value="custom">その都度入力</option></select></label>
+</div>
+<div id="employeeLodgingRegisteredWrap">
+<label>登録済み宿泊先<select id="employeeLodgingPlaceSelect"><option value="">選択してください</option></select></label>
+</div>
+<div id="employeeLodgingCustomWrap" style="display:none">
+<label>今回の宿泊先<input id="employeeLodgingPlaceCustom" placeholder="例：○○ホテル"></label>
+</div><label>現場名<select id="employeeSite"><option value="">選択してください</option></select></label><label>住所<input id="employeeAddress"></label>
+<label>資格・免許<div id="employeeQualifications" class="qualification-picker"></div><div class="hint">資格名をクリックすると選択／解除できます。</div><div id="employeeQualificationExpiry" style="margin-top:8px"></div></label>
+<label>備考<textarea id="employeeMemo"></textarea></label>
+<button class="primary" onclick="App.save('employee')">保存</button> <button class="danger" id="employeeFormDelete" onclick="App.deleteFromForm('employee')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="siteModal"><div class="box"><button class="close" onclick="App.close('site')">閉じる</button><h3 id="siteTitle">現場登録</h3>
+<label>現場名<input id="siteName"></label><label>工事番号<input id="siteNo"></label>
+<label>元請会社<select id="siteClient"><option value="">選択してください</option></select></label>
+<label>担当者<select id="siteContact"><option value="">選択してください</option></select></label>
+<label>作業員<input id="siteWorkers" placeholder="例：山田、鈴木、佐藤"><div class="hint">一覧では入力した作業員名から人数を自動表示します。</div></label>
+<div class="row">
+<label>現場区分<select id="siteRateType"><option value="local">地元</option><option value="travel">出張</option></select></label>
+<label>地元単価<input id="siteLocalRate" type="number" min="0" placeholder="円"></label>
+</div>
+<div class="row">
+<label>出張単価<input id="siteTravelRate" type="number" min="0" placeholder="円"></label>
+<label>宿泊費<input id="siteLodgingCost" type="number" min="0" placeholder="基準宿泊費"></label>
+</div>
+
+<button class="primary" onclick="App.save('site')">保存</button> <button class="danger" id="siteFormDelete" onclick="App.deleteFromForm('site')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="itemModal"><div class="box"><button class="close" onclick="App.close('item')">閉じる</button><h3 id="itemTitle">購入物品登録</h3>
+<div class="row"><label>品名<input id="itemName"></label><label>個数<input id="itemQty" type="number" min="1"></label></div>
+<div class="row"><label>金額<input id="itemAmount" type="number" min="0"></label><label>購入日<input id="itemDate" type="date"></label></div>
+<label>現場名<select id="itemSite"><option value="">選択してください</option></select></label>
+<label>備考<textarea id="itemMemo"></textarea></label>
+<button class="primary" onclick="App.save('item')">保存</button> <button class="danger" id="itemFormDelete" onclick="App.deleteFromForm('item')" style="display:none">削除</button></div></div>
+
+<div class="modal" id="salesModal"><div class="box"><button class="close" onclick="App.close('sales')">閉じる</button><h3 id="salesTitle">請求登録</h3>
+<label>元請会社<select id="salesClient"><option value="">選択してください</option></select></label>
+<label>現場名<select id="salesSite"><option value="">先に元請会社を選択してください</option></select></label>
+<div class="row"><label>請求額<input id="salesAmount" type="number" min="0"></label><label>請求日<input id="salesDate" type="date"></label></div>
+<label>経費<input id="salesExpense" type="number" min="0"></label>
+<label>備考<textarea id="salesMemo" placeholder="請求に関するメモ"></textarea></label>
+<button class="primary" onclick="App.save('sales')">保存</button> <button class="danger" id="salesFormDelete" onclick="App.deleteFromForm('sales')" style="display:none">削除</button></div></div>
+
+
+<div class="modal" id="homeDetailModal">
+<div class="box">
+<button class="close" onclick="App.closeHomeDetail()">閉じる</button>
+<h3 id="homeDetailTitle">詳細</h3>
+<div id="homeDetailBody" class="table-wrap" style="margin-top:12px"></div><div class="hint" style="margin-top:10px">一覧の外側をクリックしても戻れます。</div>
+</div>
+</div>
+
+
+<div class="modal" id="employeeDetailModal">
+<div class="box">
+<button class="close" onclick="App.closeEmployeeDetail()">閉じる</button>
+<h3 id="employeeDetailTitle">社員詳細</h3>
+<div id="employeeDetailBody"></div>
+</div>
+</div>
+
+<div class="modal" id="partnerDetailModal"><div class="box">
+<button class="close" onclick="App.closePartnerDetail()">閉じる</button>
+<h3 id="partnerDetailTitle">協力会社詳細</h3>
+<div id="partnerDetailBody"></div>
+</div></div>
+<div class="modal" id="listDetailModal"><div class="box">
+<button class="close" onclick="App.closeListDetail()">閉じる</button>
+<h3 id="listDetailTitle">詳細</h3>
+<div id="listDetailBody"></div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+const STORE_KEY="companyBusinessApp_v2";
+const DEFAULTS=[{name:'大型自動車第一種免許',type:'免許'},{name:'大型自動車第二種免許',type:'免許'},{name:'中型自動車第一種免許',type:'免許'},{name:'中型自動車第二種免許',type:'免許'},{name:'準中型自動車免許',type:'免許'},{name:'普通自動車第一種免許',type:'免許'},{name:'普通自動車第二種免許',type:'免許'},{name:'大型特殊自動車免許',type:'免許'},{name:'けん引第一種免許',type:'免許'},{name:'けん引第二種免許',type:'免許'},{name:'クレーン・デリック運転士免許',type:'免許'},{name:'移動式クレーン運転士免許',type:'免許'},{name:'ボイラー技士免許',type:'免許'},{name:'第一種衛生管理者免許',type:'免許'},{name:'第二種衛生管理者免許',type:'免許'},{name:'衛生工学衛生管理者免許',type:'免許'},{name:'潜水士免許',type:'免許'},{name:'発破技士免許',type:'免許'},{name:'ガス溶接技能講習',type:'技能講習'},{name:'玉掛け技能講習',type:'技能講習'},{name:'フォークリフト運転技能講習',type:'技能講習'},{name:'小型移動式クレーン運転技能講習',type:'技能講習'},{name:'床上操作式クレーン運転技能講習',type:'技能講習'},{name:'高所作業車運転技能講習',type:'技能講習'},{name:'車両系建設機械（整地・運搬・積込み用及び掘削用）運転技能講習',type:'技能講習'},{name:'車両系建設機械（解体用）運転技能講習',type:'技能講習'},{name:'車両系建設機械（基礎工事用）運転技能講習',type:'技能講習'},{name:'不整地運搬車運転技能講習',type:'技能講習'},{name:'ショベルローダー等運転技能講習',type:'技能講習'},{name:'地山の掘削及び土止め支保工作業主任者技能講習',type:'技能講習'},{name:'ずい道等の掘削等作業主任者技能講習',type:'技能講習'},{name:'ずい道等の覆工作業主任者技能講習',type:'技能講習'},{name:'型枠支保工の組立て等作業主任者技能講習',type:'技能講習'},{name:'足場の組立て等作業主任者技能講習',type:'技能講習'},{name:'建築物等の鉄骨の組立て等作業主任者技能講習',type:'技能講習'},{name:'鋼橋架設等作業主任者技能講習',type:'技能講習'},{name:'コンクリート造の工作物の解体等作業主任者技能講習',type:'技能講習'},{name:'コンクリート橋架設等作業主任者技能講習',type:'技能講習'},{name:'採石のための掘削作業主任者技能講習',type:'技能講習'},{name:'はい作業主任者技能講習',type:'技能講習'},{name:'船内荷役作業主任者技能講習',type:'技能講習'},{name:'木造建築物の組立て等作業主任者技能講習',type:'技能講習'},{name:'木材加工用機械作業主任者技能講習',type:'技能講習'},{name:'プレス機械作業主任者技能講習',type:'技能講習'},{name:'乾燥設備作業主任者技能講習',type:'技能講習'},{name:'化学設備関係第一種圧力容器取扱作業主任者技能講習',type:'技能講習'},{name:'普通第一種圧力容器取扱作業主任者技能講習',type:'技能講習'},{name:'特定化学物質及び四アルキル鉛等作業主任者技能講習',type:'技能講習'},{name:'鉛作業主任者技能講習',type:'技能講習'},{name:'有機溶剤作業主任者技能講習',type:'技能講習'},{name:'石綿作業主任者技能講習',type:'技能講習'},{name:'酸素欠乏危険作業主任者技能講習',type:'技能講習'},{name:'酸素欠乏・硫化水素危険作業主任者技能講習',type:'技能講習'},{name:'建築物石綿含有建材調査者講習',type:'技能講習'},{name:'石綿含有建材調査者講習（一般建築物・一戸建て等）',type:'技能講習'},{name:'アーク溶接等特別教育',type:'特別教育'},{name:'研削といしの取替え等特別教育',type:'特別教育'},{name:'自由研削といし特別教育',type:'特別教育'},{name:'動力プレス金型等の取付け・取外し・調整特別教育',type:'特別教育'},{name:'高圧・特別高圧電気取扱業務特別教育',type:'特別教育'},{name:'低圧電気取扱業務特別教育',type:'特別教育'},{name:'クレーン運転業務特別教育（5t未満）',type:'特別教育'},{name:'小型車両系建設機械運転特別教育（3t未満）',type:'特別教育'},{name:'巻上げ機運転特別教育',type:'特別教育'},{name:'フォークリフト運転特別教育（1t未満）',type:'特別教育'},{name:'高所作業車運転特別教育（10m未満）',type:'特別教育'},{name:'締固め用機械（ローラー）運転特別教育',type:'特別教育'},{name:'建設用リフト運転特別教育',type:'特別教育'},{name:'足場の組立て等特別教育',type:'特別教育'},{name:'ロープ高所作業特別教育',type:'特別教育'},{name:'フルハーネス型墜落制止用器具特別教育',type:'特別教育'},{name:'石綿取扱作業従事者特別教育',type:'特別教育'},{name:'酸素欠乏危険作業特別教育',type:'特別教育'},{name:'有機溶剤取扱業務特別教育',type:'特別教育'},{name:'粉じん作業特別教育',type:'特別教育'},{name:'伐木等の業務特別教育',type:'特別教育'},{name:'チェーンソーによる伐木等特別教育',type:'特別教育'},{name:'刈払機取扱作業者安全衛生教育',type:'特別教育'},{name:'職長・安全衛生責任者教育',type:'特別教育'},{name:'安全衛生推進者養成講習',type:'特別教育'}];
+
+const blank=()=>({
+sites:[],clients:[],partners:[],contacts:[],employees:[],qualifications:[],
+vehicles:[],items:[],sales:[],lodgingPlaces:[]
+});
+
+let state=load();
+let edit={type:null,index:-1};
+
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));
+const today=()=>new Date().toISOString().slice(0,10);
+const yen=v=>Number(v||0).toLocaleString()+"円";
+const jaSort=(a,b)=>String(a||"").localeCompare(String(b||""),"ja");
+
+const getPrefecture=v=>{
+ const s=String(v||"");
+ const m=s.match(/^(東京都|北海道|(?:京都|大阪)府|.{2,3}県)/);
+ return m?m[1]:"";
+};
+const sortByField=(arr,field)=>arr.slice().sort((a,b)=>jaSort(a[field],b[field]));
+const workerNames=v=>String(v||"").split(/[、,，\s]+/).filter(Boolean);
+const workerCount=v=>workerNames(v).length;
+
+function siteCostSummary(s){
+ const names=workerNames(s.workers);
+ const count=names.length;
+ const local=Number(s.localRate||0);
+ const travel=Number(s.travelRate||0);
+ const siteLodging=Number(s.lodgingCost||0);
+ let lodgingPeople=0, lodgingTotal=0;
+ const lodgingDetails=[];
+ names.forEach(name=>{
+   const emp=state.employees.find(e=>String(e.name||"")===name);
+   if(!emp || emp.stay!=="あり")return;
+   lodgingPeople++;
+   const place=(state.lodgingPlaces||[]).find(p=>String(p.name||"")===String(emp.lodgingPlace||""));
+   const cost=place && Number(place.cost||0)>0 ? Number(place.cost||0) : siteLodging;
+   lodgingTotal+=cost;
+   lodgingDetails.push({name,place:emp.lodgingPlace||"",cost});
+ });
+ const workCost=count*travel;
+ let partnerPaymentTotal=0;
+ names.forEach(name=>{
+   const emp=state.employees.find(e=>String(e.name||"")===name);
+   partnerPaymentTotal+=getEmployeePaymentCost(emp,s);
+ });
+ const total=workCost+partnerPaymentTotal+lodgingTotal;
+ return {count,local,travel,lodging:siteLodging,lodgingPeople,workCost,partnerPaymentTotal,lodgingTotal,total,lodgingDetails};
+}
+
+const age=b=>{
+ if(!b)return "";
+ const d=new Date(b+"T00:00:00"),n=new Date();
+ let a=n.getFullYear()-d.getFullYear();
+ if(n.getMonth()<d.getMonth() || (n.getMonth()===d.getMonth()&&n.getDate()<d.getDate())) a--;
+ return a>=0?a:"";
+};
+const wareki=b=>{
+ if(!b)return "";
+ const d=new Date(b+"T00:00:00");
+ const y=d.getFullYear();
+ if(y>=2019){const n=y-2018;return "令和"+(n===1?"元":n)+"年";}
+ if(y>=1989){const n=y-1988;return "平成"+(n===1?"元":n)+"年";}
+ if(y>=1926){const n=y-1925;return "昭和"+(n===1?"元":n)+"年";}
+ if(y>=1912){const n=y-1911;return "大正"+(n===1?"元":n)+"年";}
+ if(y>=1868){const n=y-1867;return "明治"+(n===1?"元":n)+"年";}
+ return "";
+};
+
+function load(){
+ try{
+   const raw=localStorage.getItem(STORE_KEY);
+   if(raw){const d=JSON.parse(raw);return Object.assign(blank(),d);}
+ }catch(e){}
+ return blank();
+}
+function persist(){localStorage.setItem(STORE_KEY,JSON.stringify(state));}
+function show(id){
+ closeHomeDetail();
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ const el=$(id); if(el) el.classList.add("active");
+ renderAll();
+}
+function modalId(type){return type+"Modal";}
+function close(type){
+ const m=$(modalId(type));
+ if(m)m.classList.remove("show");
+ setFormDeleteButton(type,false);
+ edit={type:null,index:-1};
+}
+function open(type,index=-1){
+ edit={type,index};
+ prepareForm(type,index);
+ setFormDeleteButton(type,index>=0);
+ const m=$(modalId(type));
+ if(m)m.classList.add("show");
+}
+function saveAndClose(type,obj){
+ const now=new Date().toISOString();
+ obj.updatedAt=now;
+ if(edit.index<0)obj.createdAt=now;
+ const arr=state[type==="site"?"sites":type==="client"?"clients":type==="partner"?"partners":type==="contact"?"contacts":type==="employee"?"employees":type==="qualification"?"qualifications":type==="vehicle"?"vehicles":type==="item"?"items":type==="lodgingPlace"?"lodgingPlaces":"sales"];
+ if(edit.index<0) arr.push(obj);
+ else {
+   const old=arr[edit.index]||{};
+   if(!obj.createdAt)obj.createdAt=old.createdAt||old.updatedAt||now;
+   arr[edit.index]=obj;
+ }
+ persist(); renderAll(); close(type);
+}
+
+function clearFields(ids){ids.forEach(id=>{if($(id))$(id).value="";});}
+function prepareForm(type,index){
+ if(type==="lodgingPlace"){
+   clearFields(["lodgingPlaceName","lodgingPlaceAddress","lodgingPlacePhone","lodgingPlaceCost","lodgingPlaceMemo"]);
+   if(index>=0){
+     const x=state.lodgingPlaces[index];
+     $("lodgingPlaceName").value=x.name||"";$("lodgingPlaceAddress").value=x.address||"";$("lodgingPlacePhone").value=x.phone||"";$("lodgingPlaceCost").value=x.cost||"";$("lodgingPlaceMemo").value=x.memo||"";$("lodgingPlaceTitle").innerText="宿泊先編集";
+   }else $("lodgingPlaceTitle").innerText="宿泊先登録";
+ }
+
+ if(type==="client"){
+   clearFields(["clientName","clientPhone","clientAddress","clientEmail"]);
+   if(index>=0){const x=state.clients[index];["name","phone","address","email"].forEach(k=>$( "client"+k[0].toUpperCase()+k.slice(1)).value=x[k]||"");$("clientTitle").innerText="元請会社編集";}
+   else $("clientTitle").innerText="元請会社登録";
+ }
+ if(type==="partner"){
+   clearFields(["partnerName","partnerPhone","partnerAddress","partnerEmail","partnerWork","partnerLocalCost","partnerTravelCost"]);
+   if(index>=0){const x=state.partners[index];$("partnerName").value=x.name||"";$("partnerPhone").value=x.phone||"";$("partnerAddress").value=x.address||"";$("partnerEmail").value=x.email||"";$("partnerWork").value=x.work||"";$("partnerLocalCost").value=x.localCost||"";$("partnerTravelCost").value=x.travelCost||"";$("partnerTitle").innerText="協力会社編集";}
+   else $("partnerTitle").innerText="協力会社登録";
+ }
+ if(type==="contact"){
+   clearFields(["contactName","contactPhone","contactEmail","contactMemo"]);
+   if(index>=0){const x=state.contacts[index];$("contactName").value=x.name||"";$("contactPhone").value=x.phone||"";$("contactEmail").value=x.email||"";$("contactMemo").value=x.memo||"";$("contactTitle").innerText="担当者編集";}
+   else $("contactTitle").innerText="担当者登録";
+ }
+ if(type==="vehicle"){
+   clearFields(["vehicleName","vehicleNumber","vehicleInspection","vehicleInsurance","vehicleService","vehicleCost","vehicleMemo"]);
+   if(index>=0){const x=state.vehicles[index];$("vehicleName").value=x.name||"";$("vehicleNumber").value=x.number||"";$("vehicleInspection").value=x.inspection||"";$("vehicleInsurance").value=x.insurance||"";$("vehicleService").value=x.service||"";$("vehicleCost").value=x.cost||"";$("vehicleMemo").value=x.memo||"";$("vehicleTitle").innerText="車両編集";}
+   else $("vehicleTitle").innerText="車両登録";
+ }
+ if(type==="qualification"){
+   clearFields(["qualificationName"]);$("qualificationType").value="特別教育";
+   if(index>=0){const x=state.qualifications[index];$("qualificationName").value=x.name||"";$("qualificationType").value=x.type||"特別教育";$("qualificationTitle").innerText="資格・免許編集";}
+   else $("qualificationTitle").innerText="資格・免許登録";
+ }
+ if(type==="employee"){
+   clearFields(["employeeName","employeeFurigana","employeeBirth","employeeAge","employeeAddress","employeeMemo","employeeLodgingPlaceCustom"]);$("employeeStay").value="なし";fillEmployeeLodgingPlaces();$("employeeLodgingMode").value="registered";$("employeeLodgingPlaceSelect").value="";toggleEmployeeLodgingMode();fillEmployeeSites();$("employeeSite").value="";
+   $("employeeType").value="自社社員"; fillPartners();$("employeeCompany").value=""; renderQualificationPicker([],{});
+   if(index>=0){const x=state.employees[index];$("employeeType").value=x.type||"自社社員";fillPartners();$("employeeCompany").value=x.type==="自社社員"?"宝来工業":(x.company||"");$("employeeCostMode").value=x.costMode||"company";$("employeeCost").value=x.cost||getEmployeePaymentCost(x, state.sites.find(s=>s.name===x.site))||"";updateEmployeePaymentCost();fillEmployeeSites(x.site||"");$("employeeName").value=x.name||"";$("employeeFurigana").value=x.furigana||"";$("employeeBirth").value=x.birth||"";$("employeeAge").value=age(x.birth||"");$("employeeStay").value=x.stay||"なし";fillEmployeeLodgingPlaces();if(x.lodgingMode==="custom"){$("employeeLodgingMode").value="custom";$("employeeLodgingPlaceCustom").value=x.lodgingPlace||"";}else{$("employeeLodgingMode").value="registered";$("employeeLodgingPlaceSelect").value=x.lodgingPlace||"";}toggleEmployeeLodgingMode();$("employeeAddress").value=x.address||"";$("employeeMemo").value=x.memo||"";renderQualificationPicker(x.qualifications||[],x.qualificationExpiry||{});$("employeeTitle").innerText="社員編集";}
+   else $("employeeTitle").innerText="社員登録";
+   toggleEmployeeCompany();
+   updateEmployeePaymentCost();
+ }
+ if(type==="site"){
+   clearFields(["siteName","siteNo","siteWorkers","siteLocalRate","siteTravelRate","siteLodgingCost"]);$("siteRateType").value="local";fillSiteSelects();
+   if(index>=0){const x=state.sites[index];$("siteName").value=x.name||"";$("siteNo").value=x.no||"";$("siteClient").value=x.client||"";$("siteContact").value=x.contact||"";$("siteWorkers").value=x.workers||"";$("siteRateType").value=x.rateType||"local";$("siteLocalRate").value=x.localRate||"";$("siteTravelRate").value=x.travelRate||"";$("siteLodgingCost").value=x.lodgingCost||"";$("siteTitle").innerText="現場編集";}
+   else $("siteTitle").innerText="現場登録";
+ }
+ if(type==="item"){
+   clearFields(["itemName","itemQty","itemAmount","itemDate","itemMemo"]);fillItemSites();
+   if(index>=0){const x=state.items[index];$("itemName").value=x.name||"";$("itemQty").value=x.qty||1;$("itemAmount").value=x.amount||"";$("itemDate").value=x.date||"";$("itemSite").value=x.site||"";$("itemMemo").value=x.memo||"";$("itemTitle").innerText="購入物品編集";}
+   else {$("itemQty").value=1;$("itemDate").value=today();$("itemTitle").innerText="購入物品登録";}
+ }
+ if(type==="sales"){
+   clearFields(["salesAmount","salesDate","salesExpense","salesMemo"]);fillSalesClients();fillSalesSitesForClient("");
+   if(index>=0){const x=state.sales[index];const editSite=state.sites.find(s=>s.name===x.site);
+   fillSalesClients(editSite?editSite.client:"");
+   fillSalesSitesForClient(editSite?editSite.client:"",x.site||"");
+   $("salesAmount").value=x.amount||"";$("salesDate").value=x.date||"";$("salesExpense").value=x.expense||"";$("salesMemo").value=x.memo||"";$("salesTitle").innerText="請求編集";}
+   else {$("salesDate").value=today();$("salesTitle").innerText="請求登録";}
+ }
+}
+
+
+function fillEmployeeLodgingPlaces(selectedValue=""){
+ const e=$("employeeLodgingPlaceSelect"); if(!e)return;
+ const vals=sortByField(state.lodgingPlaces||[],"name");
+ e.innerHTML="<option value=''>選択してください</option>"+vals.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join("");
+ if(selectedValue)e.value=selectedValue;
+}
+function getEmployeeLodgingPlace(){
+ const mode=$("employeeLodgingMode")?.value||"registered";
+ if(mode==="custom")return $("employeeLodgingPlaceCustom")?.value.trim()||"";
+ return $("employeeLodgingPlaceSelect")?.value||"";
+}
+function toggleEmployeeLodgingMode(){
+ const mode=$("employeeLodgingMode")?.value||"registered";
+ const r=$("employeeLodgingRegisteredWrap"),c=$("employeeLodgingCustomWrap");
+ if(r)r.style.display=mode==="registered"?"block":"none";
+ if(c)c.style.display=mode==="custom"?"block":"none";
+}
+
+function getPartnerCostByName(name,siteName=""){
+ const p=(state.partners||[]).find(x=>String(x.name||"")===String(name||""));
+ if(!p)return 0;
+ const site=(state.sites||[]).find(x=>String(x.name||"")===String(siteName||""));
+ return site && site.rateType==="travel" ? Number(p.travelCost||0) : Number(p.localCost||0);
+}
+function getEmployeePaymentCost(emp,site){
+ if(!emp)return 0;
+ if(emp.costMode==="individual")return Number(emp.cost||0);
+ if(emp.type==="協力会社社員"){
+   const p=(state.partners||[]).find(x=>String(x.name||"")===String(emp.company||""));
+   if(!p)return 0;
+   return site && site.rateType==="travel" ? Number(p.travelCost||0) : Number(p.localCost||0);
+ }
+ return Number(emp.cost||0);
+}
+function updateEmployeePaymentCost(){
+ const mode=$("employeeCostMode")?.value||"company";
+ const type=$("employeeType")?.value||"自社社員";
+ const company=$("employeeCompany")?.value||"";
+ const el=$("employeeCost"); if(!el)return;
+ if(mode==="individual"){el.disabled=false;return;}
+ el.disabled=true;
+ el.value=(type==="協力会社社員"?getPartnerCostByName(company,$("employeeSite")?.value||""):0)||"";
+}
+function fillPartners(){const e=$("employeeCompany");e.innerHTML="<option value=''>選択してください</option>"+state.partners.map(x=>`<option>${esc(x.name)}</option>`).join("");}
+function fillEmployeeSites(selectedValue=""){
+ const e=$("employeeSite"); if(!e)return;
+ e.innerHTML="<option value=''>選択してください</option>"+sortByField(state.sites,"name").map(x=>`<option>${esc(x.name)}</option>`).join("");
+ if(selectedValue)e.value=selectedValue;
+}
+function fillSiteSelects(){
+ $("siteClient").innerHTML="<option value=''>選択してください</option>"+state.clients.map(x=>`<option>${esc(x.name)}</option>`).join("");
+ $("siteContact").innerHTML="<option value=''>選択してください</option>"+state.contacts.map(x=>`<option>${esc(x.name)}</option>`).join("");
+}
+function fillItemSites(){ $("itemSite").innerHTML="<option value=''>選択してください</option>"+state.sites.map(x=>`<option>${esc(x.name)}</option>`).join("");}
+function fillSalesClients(selectedValue=""){
+ const e=$("salesClient"); if(!e)return;
+ const vals=[...new Set(state.clients.map(x=>String(x.name||"")).filter(Boolean))].sort();
+ e.innerHTML="<option value=''>選択してください</option>"+vals.map(v=>`<option>${esc(v)}</option>`).join("");
+ if(selectedValue)e.value=selectedValue;
+}
+function fillSalesSitesForClient(client,selectedValue=""){
+ const e=$("salesSite"); if(!e)return;
+ if(!client){
+   e.innerHTML="<option value=''>先に元請会社を選択してください</option>";
+   return;
+ }
+ const sites=state.sites.filter(x=>String(x.client||"")===String(client));
+ e.innerHTML="<option value=''>選択してください</option>"+sites.map(x=>`<option>${esc(x.name)}</option>`).join("");
+ if(selectedValue)e.value=selectedValue;
+}
+function updateSalesSiteOptions(){
+ const client=$("salesClient")?.value||"";
+ fillSalesSitesForClient(client);
+}
+
+function toggleEmployeeCompany(){ const self=$("employeeType").value==="自社社員"; $("employeeCompany").disabled=self; if(self)$("employeeCompany").value="宝来工業"; }
+function renderQualificationPicker(selected,expiryMap={}){
+ const e=$("employeeQualifications"); e.innerHTML="";
+ state.qualifications.forEach(q=>{
+   const b=document.createElement("button");
+   b.type="button";
+   b.className="qualification-chip"+(selected.includes(q.name)?" selected":"");
+   b.textContent=q.name;
+   b.dataset.q=q.name;
+   b.onclick=()=>{b.classList.toggle("selected");renderQualificationExpiry();};
+   e.appendChild(b);
+ });
+ const box=$("employeeQualificationExpiry");
+ if(box)box.dataset.expiryMap=JSON.stringify(expiryMap||{});
+ renderQualificationExpiry();
+}
+function renderQualificationExpiry(){
+ const box=$("employeeQualificationExpiry"); if(!box)return;
+ let map={}; try{map=JSON.parse(box.dataset.expiryMap||"{}")}catch(e){}
+ const selected=[...$("employeeQualifications").querySelectorAll(".selected")];
+ if(!selected.length){box.innerHTML="";return;}
+ box.innerHTML=selected.map(b=>{
+   const q=b.dataset.q||"";
+   const v=map[q]||"";
+   return `<div style="display:grid;grid-template-columns:1fr 180px;gap:8px;align-items:center;margin-top:6px"><span style="font-size:12px">${esc(q)}</span><input type="date" data-qual-expiry="${esc(q)}" value="${esc(v)}"></div>`;
+ }).join("");
+}
+function selectedQualifications(){
+ return [...$("employeeQualifications").querySelectorAll(".selected")].map(b=>b.dataset.q);
+}
+function selectedQualificationExpiry(){
+ const box=$("employeeQualificationExpiry"); if(!box)return {};
+ const map={};
+ box.querySelectorAll("[data-qual-expiry]").forEach(el=>{map[el.getAttribute("data-qual-expiry")]=el.value||"";});
+ return map;
+}
+
+
+function getDataArray(type){
+ const map={site:"sites",client:"clients",partner:"partners",contact:"contacts",employee:"employees",qualification:"qualifications",vehicle:"vehicles",item:"items",sales:"sales",lodgingPlace:"lodgingPlaces"};
+ return state[map[type]];
+}
+function setFormDeleteButton(type,visible){
+ const b=document.getElementById(type+"FormDelete");
+ if(b)b.style.display=visible?"inline-block":"none";
+}
+function deleteFromForm(type){
+ try{
+   const idx=edit && Number.isInteger(edit.index) ? edit.index : -1;
+   if(idx<0)return;
+   const arr=getDataArray(type);
+   if(!Array.isArray(arr) || !arr[idx])return;
+   const x=arr[idx];
+   const name=x.name||x.site||"このデータ";
+   if(!window.confirm("「"+name+"」を削除しますか？"))return;
+   arr.splice(idx,1);
+   persist();
+   renderAll();
+   close(type);
+ }catch(e){
+   console.error("deleteFromForm error",e);
+   window.alert("削除中にエラーが発生しました。");
+ }
+}
+
+function save(type){
+ try{
+  if(type==="client"){const name=$("clientName").value.trim();if(!name)return alert("会社名を入力してください");saveAndClose(type,{name,phone:$("clientPhone").value.trim(),address:$("clientAddress").value.trim(),email:$("clientEmail").value.trim()});}
+  else if(type==="partner"){const name=$("partnerName").value.trim();if(!name)return alert("会社名を入力してください");saveAndClose(type,{name,phone:$("partnerPhone").value.trim(),address:$("partnerAddress").value.trim(),email:$("partnerEmail").value.trim(),work:$("partnerWork").value.trim(),localCost:$("partnerLocalCost").value||0,travelCost:$("partnerTravelCost").value||0});}
+  else if(type==="contact"){const name=$("contactName").value.trim();if(!name)return alert("担当者名を入力してください");saveAndClose(type,{name,phone:$("contactPhone").value.trim(),email:$("contactEmail").value.trim(),memo:$("contactMemo").value.trim()});}
+  else if(type==="vehicle"){const name=$("vehicleName").value.trim();if(!name)return alert("車両名を入力してください");saveAndClose(type,{name,number:$("vehicleNumber").value.trim(),inspection:$("vehicleInspection").value,insurance:$("vehicleInsurance").value,service:$("vehicleService").value.trim(),cost:$("vehicleCost").value,memo:$("vehicleMemo").value.trim()});}
+  else if(type==="qualification"){const name=$("qualificationName").value.trim();if(!name)return alert("資格・免許名を入力してください");saveAndClose(type,{name,type:$("qualificationType").value});}
+  else if(type==="employee"){const name=$("employeeName").value.trim();const et=$("employeeType").value;const company=et==="自社社員"?"宝来工業":$("employeeCompany").value;if(!name)return alert("氏名を入力してください");if(et==="協力会社社員"&&!company)return alert("所属協力会社を選択してください");saveAndClose(type,{type:et,company,name,furigana:$("employeeFurigana").value.trim(),birth:$("employeeBirth").value,stay:$("employeeStay").value||"なし",lodgingMode:$("employeeLodgingMode").value,lodgingPlace:getEmployeeLodgingPlace(),costMode:$("employeeCostMode").value||"company",cost:Number($("employeeCost").value||0),site:$("employeeSite").value||"",address:$("employeeAddress").value.trim(),qualifications:selectedQualifications(),qualificationExpiry:selectedQualificationExpiry(),memo:$("employeeMemo").value.trim()});}
+  else if(type==="site"){const name=$("siteName").value.trim();if(!name)return alert("現場名を入力してください");saveAndClose(type,{name,no:$("siteNo").value.trim(),client:$("siteClient").value,contact:$("siteContact").value,workers:$("siteWorkers").value.trim(),rateType:$("siteRateType").value||"local",localRate:$("siteLocalRate").value||0,travelRate:$("siteTravelRate").value||0,lodgingCost:$("siteLodgingCost").value||0});}
+  else if(type==="item"){const name=$("itemName").value.trim();if(!name)return alert("品名を入力してください");saveAndClose(type,{name,qty:$("itemQty").value||1,amount:$("itemAmount").value||0,date:$("itemDate").value,site:$("itemSite").value,memo:$("itemMemo").value.trim()});}
+  else if(type==="lodgingPlace"){
+   const name=$("lodgingPlaceName").value.trim();
+   if(!name)return alert("宿泊先名を入力してください");
+   saveAndClose(type,{name,address:$("lodgingPlaceAddress").value.trim(),phone:$("lodgingPlacePhone").value.trim(),cost:$("lodgingPlaceCost").value||0,memo:$("lodgingPlaceMemo").value.trim()});
+ }
+ else if(type==="sales"){
+   if(!$("salesClient").value)return alert("元請会社を選択してください");
+   if(!$("salesSite").value)return alert("現場名を選択してください");
+   saveAndClose(type,{client:$("salesClient").value,site:$("salesSite").value,amount:$("salesAmount").value||0,date:$("salesDate").value,expense:$("salesExpense").value||0,memo:$("salesMemo").value.trim()});
+ }
+ }catch(e){alert("保存中にエラーが発生しました。もう一度お試しください。");console.error(e);}
+}
+
+function del(type,index){
+ const map={site:"sites",client:"clients",partner:"partners",contact:"contacts",employee:"employees",qualification:"qualifications",vehicle:"vehicles",item:"items",sales:"sales",lodgingPlace:"lodgingPlaces"};
+ const arr=state[map[type]]; if(!arr||index<0||index>=arr.length)return;
+ const name=arr[index].name||arr[index].site||"このデータ";
+ if(!confirm("「"+name+"」を削除しますか？"))return;
+ arr.splice(index,1);persist();renderAll();
+}
+function rows(body,arr,make){$(body).innerHTML=arr.length?arr.map((x,i)=>make(x,i)).join(""):`<tr><td colspan="20" class="empty">データがありません。</td></tr>`;}
+
+
+function renderSalesGrouped(){
+ const box=$("salesGroupedBody");
+ if(!box)return;
+ const filteredSales=getFilteredSales();
+ if(!filteredSales.length){box.innerHTML='<div class="card"><div class="empty">該当する請求データがありません。</div></div>';return;}
+
+ const groups={};
+ filteredSales.forEach(x=>{
+   const site=state.sites.find(s=>s.name===x.site);
+   const client=x.client || ((site&&site.client)||"元請会社未設定");
+   if(!groups[client])groups[client]={};
+   if(!groups[client][x.site])groups[client][x.site]=[];
+   groups[client][x.site].push({x,i:state.sales.indexOf(x)});
+ });
+
+ let html="";
+ Object.keys(groups).sort((a,b)=>{
+   const latestA=Math.max(...Object.values(groups[a]).flat().map(o=>Date.parse(o.x.date||"")||0));
+   const latestB=Math.max(...Object.values(groups[b]).flat().map(o=>Date.parse(o.x.date||"")||0));
+   return latestB-latestA;
+ }).forEach(client=>{
+   html+=`<div class="card"><h3 style="margin-bottom:10px">🏢 ${esc(client)}</h3>`;
+   Object.keys(groups[client]).sort((a,b)=>{
+     const latestA=Math.max(...groups[client][a].map(o=>Date.parse(o.x.date||"")||0));
+     const latestB=Math.max(...groups[client][b].map(o=>Date.parse(o.x.date||"")||0));
+     return latestB-latestA;
+   }).forEach(siteName=>{
+     const list=groups[client][siteName].slice().sort((a,b)=>String(b.x.date||"").localeCompare(String(a.x.date||"")));
+     const total=list.reduce((s,o)=>s+Number(o.x.amount||0),0);
+     const exp=list.reduce((s,o)=>s+Number(o.x.expense||0),0);
+     const profit=total-exp;
+     html+=`<div style="margin-top:10px;border:1px solid #e2e8f0;border-radius:9px;overflow:hidden">
+       <div style="padding:9px 11px;background:#f8fafc;font-weight:700;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+         <span>🏗️ ${esc(siteName)}</span><span>請求合計 ${yen(total)} ／ 経費 ${yen(exp)} ／ 利益 ${yen(profit)}</span>
+       </div>
+       <div class="table-wrap" style="margin:0;border:0;border-radius:0">
+       <table><thead><tr><th>請求日</th><th>請求額</th><th>経費</th><th>利益</th><th>備考</th><th class="action-cell">操作</th></tr></thead><tbody>`;
+     list.forEach(o=>{
+       const p=Number(o.x.amount||0)-Number(o.x.expense||0);
+       html+=`<tr data-detail-type="sales" data-detail-index="${o.i}" onclick="App.showListDetail('sales',${o.i})" style="cursor:pointer" title="クリックすると請求詳細を表示"><td>${esc(o.x.date)}</td><td>${yen(o.x.amount)}</td><td>${yen(o.x.expense)}</td><td>${yen(p)}</td><td>${esc(o.x.memo||"")}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('sales',${o.i})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('sales',${o.i})">削除</button></td></tr>`;
+     });
+     html+=`</tbody></table></div></div>`;
+   });
+   html+="</div>";
+ });
+ box.innerHTML=html;
+}
+
+
+const searchState={site:"",siteField:"site",employee:"",employeeType:"all",sales:"",salesField:"site"};
+function getFilteredSites(){
+ const q=searchState.site;
+ const field=searchState.siteField==="site"?"name":searchState.siteField;
+ if(!q)return state.sites;
+ return state.sites.filter(x=>String(x[field]||"")===q);
+}
+function getFilteredEmployees(){
+ const q=searchState.employee.trim().toLowerCase();
+ const type=searchState.employeeType;
+ return state.employees.filter(x=>(type==="all"||x.type===type) &&
+   (!q || [x.name,x.company,x.type,x.site,x.address].some(v=>String(v||"").toLowerCase().includes(q))));
+}
+function getFilteredSales(){
+ const q=searchState.sales;
+ if(!q)return state.sales;
+ const field=searchState.salesField;
+ return state.sales.filter(x=>{
+   if(field==="site")return String(x.site||"")===q;
+   const site=state.sites.find(s=>s.name===x.site);
+   return String(site?site.client:"")===q;
+ });
+}
+function updateSiteSearchOptions(){
+ const field=$("siteSearchField").value;
+ searchState.siteField=field;
+ const dataField=field==="site"?"name":field;
+ const el=$("siteSearch");
+ const vals=[...new Set(state.sites.map(x=>String(x[dataField]||"")).filter(Boolean))].sort();
+ el.innerHTML='<option value="">すべて</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join("");
+ if(searchState.site && vals.includes(searchState.site))el.value=searchState.site; else {searchState.site="";el.value="";}
+}
+function applySiteSearch(){
+ searchState.site=$("siteSearch").value;
+ renderAll();
+}
+function updateSalesSearchOptions(){
+ const field=$("salesSearchField").value;
+ searchState.salesField=field;
+ const el=$("salesSearch");
+ let vals=[];
+ if(field==="site") vals=[...new Set(state.sites.map(x=>String(x.name||"")).filter(Boolean))].sort();
+ else vals=[...new Set(state.sites.map(x=>String(x.client||"")).filter(Boolean))].sort();
+ el.innerHTML='<option value="">すべて</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join("");
+ if(searchState.sales && vals.includes(searchState.sales))el.value=searchState.sales; else {searchState.sales="";el.value="";}
+}
+function applySalesSearch(){
+ searchState.sales=$("salesSearch").value;
+ renderAll();
+}
+function renderSearchEvents(){
+ const ss=$("siteSearch"),sf=$("siteSearchField"),es=$("employeeSearch"),et=$("employeeSearchType"),xs=$("salesSearch"),xf=$("salesSearchField");
+ if(sf){sf.value=searchState.siteField;}
+ if(es){es.value=searchState.employee;es.oninput=()=>{searchState.employee=es.value;renderAll();}}
+ if(et){et.value=searchState.employeeType;et.onchange=()=>{searchState.employeeType=et.value;renderAll();}}
+ if(xf){xf.value=searchState.salesField;}
+ updateSiteSearchOptions();
+ updateSalesSearchOptions();
+}
+function clearSearch(type){
+ if(type==="site"){searchState.site="";searchState.siteField="site";}
+ if(type==="employee"){searchState.employee="";searchState.employeeType="all";}
+ if(type==="sales"){searchState.sales="";searchState.salesField="site";}
+ renderAll();
+}
+
+
+function recentDate(x){
+ const v=x.updatedAt||x.createdAt||x.date||"";
+ const d=new Date(v);
+ return isNaN(d.getTime())?"":(d.getFullYear()+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+String(d.getDate()).padStart(2,"0")+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"));
+}
+function renderRecentActivity(){
+ const box=$("recentActivity");
+ if(!box)return;
+ const items=[];
+ const push=(type,arr,label,nameFn)=>{
+   arr.forEach((x,i)=>items.push({type,index:i,label,name:nameFn(x),time:(x.updatedAt||x.createdAt)?Date.parse(x.updatedAt||x.createdAt):0,date:x.date||""}));
+ };
+ push("employee",state.employees,"社員",x=>x.name||"社員");
+ push("sales",state.sales,"請求",x=>(x.site||"請求")+"（"+yen(x.amount)+"）");
+ push("item",state.items,"購入物品",x=>x.name||"購入物品");
+
+ items.sort((a,b)=>{
+   if(b.time!==a.time)return b.time-a.time;
+   return String(b.date||"").localeCompare(String(a.date||""));
+ });
+ const recent=items.slice(0,8);
+ if(!recent.length){box.innerHTML='<div class="empty">最近の登録・更新はありません。</div>';return;}
+ let h="";
+ recent.forEach(o=>{
+   const d=recentDate(o.type==="employee"?state.employees[o.index]:o.type==="sales"?state.sales[o.index]:state.items[o.index]);
+   h+=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #e5e7eb;cursor:pointer" onclick="App.open('${o.type}',${o.index})">
+     <div><b>${esc(o.label)}</b><span style="margin-left:10px">${esc(o.name)}</span></div>
+     <div style="font-size:11px;color:#64748b;white-space:nowrap">${esc(d||"")}</div>
+   </div>`;
+ });
+ box.innerHTML=h;
+}
+
+
+function daysUntil(dateStr){
+ const d=new Date(String(dateStr)+"T00:00:00");
+ if(isNaN(d.getTime()))return null;
+ const t=new Date(); t.setHours(0,0,0,0);
+ return Math.ceil((d-t)/86400000);
+}
+function renderExpiryAlerts(){
+ const box=$("expiryAlerts");
+ if(!box)return;
+ const alerts=[];
+ state.vehicles.forEach((v,i)=>{
+   if(v.inspection){
+     const d=daysUntil(v.inspection);
+     if(d!==null && d<=30) alerts.push({days:d,text:`車検：${v.name||"車両"}（${v.inspection}）`,type:d<0?"danger":"warn",kind:"vehicle",index:i});
+   }
+   if(v.insurance){
+     const d=daysUntil(v.insurance);
+     if(d!==null && d<=30) alerts.push({days:d,text:`任意保険：${v.name||"車両"}（${v.insurance}）`,type:d<0?"danger":"warn",kind:"vehicle",index:i});
+   }
+ });
+ state.employees.forEach((e,employeeIndex)=>{
+   const exp=e.qualificationExpiry||{};
+   (e.qualifications||[]).forEach(q=>{
+     const date=exp[q];
+     if(!date)return;
+     const d=daysUntil(date);
+     if(d!==null && d<=30){
+       alerts.push({days:d,text:`資格：${e.name||"社員"}「${q}」の有効期限（${date}）`,type:d<0?"danger":"warn",kind:"employee",index:employeeIndex});
+     }
+   });
+ });
+ alerts.sort((a,b)=>a.days-b.days);
+ if(!alerts.length){
+   box.innerHTML='<div class="alert-item alert-ok">現在、30日以内に期限を迎える車検・任意保険はありません。</div>';
+   return;
+ }
+ box.innerHTML=alerts.map(a=>{
+   const status=a.days<0?`期限切れ ${Math.abs(a.days)}日前`:a.days===0?"本日が期限":`あと${a.days}日`;
+   return `<div class="alert-item alert-${a.type}" onclick="App.open('${a.kind}',${a.index})" style="cursor:pointer"><b>${esc(status)}</b>　${esc(a.text)}</div>`;
+ }).join("");
+}
+
+
+function fillQualificationOwnerOptions(){
+ const e=$("qualOwnerSearch");
+ if(!e)return;
+ const current=e.value||"";
+ const vals=sortByField(state.qualifications,"name");
+ e.innerHTML='<option value="">資格を選択してください</option>'+vals.map(q=>`<option value="${esc(q.name)}">${esc(q.name)}</option>`).join("");
+ if(current && vals.some(q=>q.name===current)) e.value=current;
+}
+function searchQualificationOwners(){
+ const e=document.getElementById("qualOwnerSearch");
+ if(!e)return;
+ renderQualificationOwners();
+}
+function clearQualificationOwnerSearch(){
+ const e=$("qualOwnerSearch");
+ if(e){
+   e.value="";
+   e.selectedIndex=0;
+ }
+ renderQualificationOwners();
+}
+function bindQualificationOwnerSearch(){
+ const e=$("qualOwnerSearch");
+ if(e)e.onchange=function(){renderQualificationOwners();};
+}
+
+function renderQualificationOwners(){
+ const body=$("qualOwnerBody");
+ const count=$("qualOwnerResultCount");
+ if(!body)return;
+ const q=$("qualOwnerSearch")?.value||"";
+ const owners=q?state.employees.filter(e=>(e.qualifications||[]).includes(q)).slice().sort((a,b)=>jaSort(a.name,b.name)):[];
+ if(count)count.innerText=q?(owners.length+"人が所有"):"資格を選択してください";
+ if(!q){
+   body.innerHTML='<tr><td colspan="8" class="empty">資格を選択してください。</td></tr>';
+   return;
+ }
+ if(!owners.length){
+   body.innerHTML='<tr><td colspan="8" class="empty">この資格を所有している社員はいません。</td></tr>';
+   return;
+ }
+ body.innerHTML=owners.map(x=>{
+   const exp=(x.qualificationExpiry||{})[q]||"期限なし";
+   const idx=state.employees.indexOf(x);
+   return `<tr style="cursor:pointer" title="クリックすると社員詳細を表示" onclick="App.showEmployeeDetail(${idx})">
+     <td class="employee-name" title="${esc(x.name)}">${esc(x.name)}</td>
+     <td>${esc(x.furigana||"")}</td>
+     <td>${esc(x.company||"")}</td>
+     <td>${esc(x.type||"")}</td>
+     <td>${esc(x.site||"")}</td>
+     <td>${yen(getEmployeePaymentCost(x, state.sites.find(s=>s.name===x.site)))}${x.costMode==="individual"?'<span class="individual-badge">個別設定</span>':""}</td>
+     <td>${esc(x.stay||"なし")}</td>
+     <td>${esc(exp)}</td>
+     <td class="action-cell"><button type="button" class="small edit" onclick="event.stopPropagation();App.open('employee',${idx})">編集</button></td>
+   </tr>`;
+ }).join("");
+}
+
+
+function renderStayers(){
+ const body=$("stayerBody"),count=$("stayerResultCount");
+ if(!body)return;
+ const arr=state.employees.filter(x=>x.stay==="あり").slice().sort((a,b)=>jaSort(a.name,b.name));
+ if(count)count.innerText=arr.length+"人";
+ if(!arr.length){
+   body.innerHTML='<tr><td colspan="9" class="empty">宿泊：ありの社員はいません。</td></tr>';
+   return;
+ }
+ body.innerHTML=arr.map(x=>{
+   const idx=state.employees.indexOf(x);
+   return `<tr style="cursor:pointer" title="クリックすると社員詳細を表示" onclick="App.showEmployeeDetail(${idx})">
+     <td class="employee-name" title="${esc(x.name)}">${esc(x.name)}</td>
+     <td>${esc(x.furigana||"")}</td>
+     <td>${esc(x.company||"")}</td>
+     <td>${esc(x.type||"")}</td>
+     <td>${esc(x.site||"")}</td>
+     <td>${esc(getPrefecture(x.address))}</td>
+     <td>${yen(getEmployeePaymentCost(x, state.sites.find(s=>s.name===x.site)))}${x.costMode==="individual"?'<span class="individual-badge">個別設定</span>':""}</td>
+     <td>${esc(x.stay||"なし")}</td>
+     <td>${esc(x.lodgingPlace||"")}<div style="font-size:10px;color:#64748b">${(() => { const lp=(state.lodgingPlaces||[]).find(p=>p.name===x.lodgingPlace); return lp&&lp.cost ? "宿泊経費 "+yen(lp.cost) : ""; })()}</div></td>
+     <td class="action-cell"><button type="button" class="small edit" onclick="event.stopPropagation();App.open('employee',${idx})">編集</button></td>
+   </tr>`;
+ }).join("");
+}
+
+
+function renderLodgingPlaces(){
+ const body=$("lodgingPlaceBody"); if(!body)return;
+ const arr=sortByField(state.lodgingPlaces||[],"name");
+ if(!arr.length){body.innerHTML='<tr><td colspan="6" class="empty">登録済みの宿泊先がありません。</td></tr>';return;}
+ body.innerHTML=arr.map(x=>{
+   const idx=state.lodgingPlaces.indexOf(x);
+   return `<tr data-detail-type="lodgingPlace" data-detail-index="${idx}" onclick="App.showListDetail('lodgingPlace',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.address)}</td><td>${esc(x.phone)}</td><td>${yen(x.cost)}</td><td>${esc(x.memo)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('lodgingPlace',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('lodgingPlace',${idx})">削除</button></td></tr>`;
+ }).join("");
+}
+function renderAll(){
+ rows("siteBody",getFilteredSites().slice().sort((a,b)=>jaSort(a.name,b.name)),x=>{const idx=state.sites.indexOf(x);return `<tr data-detail-type="site" data-detail-index="${idx}" onclick="App.showListDetail('site',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.no)}</td><td>${esc(x.client)}</td><td>${esc(x.contact)}</td><td>${workerCount(x.workers)}人</td><td>${x.rateType==="travel"?"出張":"地元"}</td><td>${yen(x.localRate)}</td><td>${yen(x.travelRate)}</td><td>${yen(x.lodgingCost)}<div style="font-size:10px;color:#64748b">宿泊対象 ${siteCostSummary(x).lodgingPeople}人 ／ 協力会社支払い ${yen(siteCostSummary(x).partnerPaymentTotal)} ／ 宿泊費 ${yen(siteCostSummary(x).lodgingTotal)} ／ 合計 ${yen(siteCostSummary(x).total)}</div></td><td><button class="small edit" onclick="event.stopPropagation();App.open('site',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('site',${idx})">削除</button></td></tr>`;});
+ rows("clientBody",sortByField(state.clients,"name"),x=>{const idx=state.clients.indexOf(x);return `<tr data-detail-type="client" data-detail-index="${idx}" onclick="App.showListDetail('client',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.address)}</td><td>${esc(x.email)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('client',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('client',${idx})">削除</button></td></tr>`;});
+ rows("partnerBody",sortByField(state.partners,"name"),x=>{const idx=state.partners.indexOf(x);return `<tr data-partner-index="${idx}" onclick="App.showPartnerDetail(${idx})" style="cursor:pointer" title="クリックすると協力会社詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.address)}</td><td>${esc(x.email)}</td><td>${esc(x.work)}</td><td>${yen(x.localCost)}</td><td>${yen(x.travelCost)}</td><td class="action-cell"><button type="button" class="small edit" onclick="event.stopPropagation();App.open('partner',${idx})">編集</button> <button type="button" class="small del" onclick="event.stopPropagation();App.del('partner',${idx})">削除</button></td></tr>`;});
+ rows("contactBody",sortByField(state.contacts,"name"),x=>{const idx=state.contacts.indexOf(x);return `<tr data-detail-type="contact" data-detail-index="${idx}" onclick="App.showListDetail('contact',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.email)}</td><td>${esc(x.memo)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('contact',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('contact',${idx})">削除</button></td></tr>`;});
+ rows("employeeBody",getFilteredEmployees().slice().sort((a,b)=>jaSort(a.name,b.name)),x=>{const idx=state.employees.indexOf(x);return `<tr data-employee-index="${idx}" onclick="App.showEmployeeDetail(${idx})" style="cursor:pointer"><td>${esc(x.type)}</td><td>${esc(x.company)}</td><td class="employee-name" title="${esc(x.name)}"><div>${esc(x.name)}</div><div class="employee-furigana">${esc(x.furigana||"")}</div></td><td>${esc(x.site||"")}</td><td>${yen(getEmployeePaymentCost(x, state.sites.find(s=>s.name===x.site)))}${x.costMode==="individual"?'<span class="individual-badge">個別設定</span>':""}</td><td><div>${esc(x.birth)}</div><div style="font-size:11px;color:#64748b">${esc(wareki(x.birth))}</div></td><td>${age(x.birth)}</td><td>${esc(x.stay||"なし")}</td><td>${esc(getPrefecture(x.address))}</td><td>${esc(x.memo)}</td><td><button class="small edit" onclick="event.stopPropagation();App.open('employee',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('employee',${idx})">削除</button></td></tr>`;});
+ rows("qualificationBody",sortByField(state.qualifications,"name"),x=>{const idx=state.qualifications.indexOf(x);return `<tr data-detail-type="qualification" data-detail-index="${idx}" onclick="App.showListDetail('qualification',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.type)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('qualification',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('qualification',${idx})">削除</button></td></tr>`;});
+ rows("vehicleBody",sortByField(state.vehicles,"name"),x=>{const idx=state.vehicles.indexOf(x);return `<tr data-detail-type="vehicle" data-detail-index="${idx}" onclick="App.showListDetail('vehicle',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.number)}</td><td>${esc(x.inspection)}</td><td>${esc(x.insurance)}</td><td>${esc(x.service)}</td><td>${yen(x.cost)}</td><td>${esc(x.memo)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('vehicle',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('vehicle',${idx})">削除</button></td></tr>`;});
+ rows("itemBody",sortByField(state.items,"name"),x=>{const idx=state.items.indexOf(x);return `<tr data-detail-type="item" data-detail-index="${idx}" onclick="App.showListDetail('item',${idx})" style="cursor:pointer" title="クリックすると詳細を表示"><td>${esc(x.name)}</td><td>${esc(x.qty)}</td><td>${yen(x.amount)}</td><td>${esc(x.site)}</td><td>${esc(x.date)}</td><td>${esc(x.memo)}</td><td class="action-cell"><button class="small edit" onclick="event.stopPropagation();App.open('item',${idx})">編集</button> <button class="small del" onclick="event.stopPropagation();App.del('item',${idx})">削除</button></td></tr>`;});
+ renderSalesGrouped();
+ updateDashboard();
+ updateBackupStatus();
+ renderSearchEvents();
+ renderRecentActivity();
+ renderExpiryAlerts();
+ renderStayers();
+ renderLodgingPlaces();
+ fillEmployeeLodgingPlaces();
+ const qo=$("qualOwnerSearch");
+ if(qo && qo.options.length<=1) fillQualificationOwnerOptions();
+ renderQualificationOwners();
+}
+
+
+function renderSiteCostSummary(){
+ const box=$("dashSiteCosts");
+ if(!box)return;
+ if(!state.sites.length){box.innerText="現場がありません。";return;}
+ let totalWork=0,totalLodging=0,total=0,html="";
+ state.sites.forEach(s=>{
+   const c=siteCostSummary(s);
+   totalWork+=c.workCost; totalLodging+=c.lodgingTotal; total+=c.total;
+   html+=`<div style="padding:9px 0;border-bottom:1px solid #eee"><b>${esc(s.name)}</b>：${c.count}人
+   <div style="font-size:13px;color:#64748b;margin-top:4px">1日人件費 ${yen(c.workCost)} ／ 協力会社支払い ${yen(c.partnerPaymentTotal)}（現場区分 ${s.rateType==="travel"?"出張":"地元"}） ／ 宿泊対象 ${c.lodgingPeople}人 ／ 宿泊費 ${yen(c.lodgingTotal)} ／ 合計 ${yen(c.total)}</div></div>`;
+ });
+ html+=`<div style="padding:11px 0;font-weight:700">全現場合計：出張人件費 ${yen(totalWork)} ／ 宿泊費 ${yen(totalLodging)} ／ 概算合計 ${yen(total)}</div>`;
+ box.innerHTML=html;
+}
+
+function updateDashboard(){
+ const own=state.employees.filter(x=>x.type==="自社社員").length;
+ const partner=state.employees.filter(x=>x.type==="協力会社社員").length;
+ $("dashTotalWorkers").innerText=(own+partner)+"人";$("dashOwnWorkers").innerText=own+"人";$("dashPartnerWorkers").innerText=partner+"人";
+ $("dashSites").innerText=state.sites.length+"件";$("dashVehicles").innerText=state.vehicles.length+"台";
+ const ym=new Date().toISOString().slice(0,7);
+ const month=state.sales.filter(x=>String(x.date||"").startsWith(ym));
+ const sales=month.reduce((a,x)=>a+Number(x.amount||0),0), exp=month.reduce((a,x)=>a+Number(x.expense||0),0);
+ $("dashSales").innerText=yen(sales);$("dashExpense").innerText=yen(exp);$("dashProfit").innerText=yen(sales-exp);
+ let html="";
+ state.sites.forEach(s=>{
+   const names=String(s.workers||"").split(/[、,，\s]+/).filter(Boolean);
+   const counts={own:0,unknown:0,companies:{}};
+   names.forEach(n=>{const e=state.employees.find(x=>x.name===n);if(!e)counts.unknown++;else if(e.type==="自社社員")counts.own++;else counts.companies[e.company||"協力会社"]=(counts.companies[e.company||"協力会社"]||0)+1;});
+   let detail=`自社社員 ${counts.own}人`;
+   Object.keys(counts.companies).forEach(k=>detail+=` ／ ${esc(k)} ${counts.companies[k]}人`);
+   if(counts.unknown)detail+=` ／ 未登録 ${counts.unknown}人`;
+   html+=`<div style="padding:9px 0;border-bottom:1px solid #eee"><b>${esc(s.name)}</b>：${names.length}人<div style="font-size:13px;color:#64748b;margin-top:4px">${detail}</div></div>`;
+ });
+ $("dashSiteWorkers").innerHTML=html||"現場がありません。";
+ renderSiteCostSummary();
+}
+
+function addDefaults(){
+ const have=new Set(state.qualifications.map(x=>x.name));
+ let add=0;DEFAULTS.forEach(x=>{if(!have.has(x.name)){state.qualifications.push(x);add++;}});
+ persist();renderAll();alert(add+"件の初期資格を追加しました。");
+}
+
+function backup(){
+ const blob=new Blob([JSON.stringify({version:2,savedAt:new Date().toISOString(),data:state},null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="会社業務管理_バックアップ_"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function restore(input){
+ const file=input.files&&input.files[0];if(!file)return;
+ const reader=new FileReader();reader.onload=()=>{try{
+   const obj=JSON.parse(reader.result);const d=obj.data||obj;
+   const keys=Object.keys(blank());keys.forEach(k=>state[k]=Array.isArray(d[k])?d[k]:[]);
+   persist();renderAll();alert("データを復元しました。");
+ }catch(e){alert("正しいバックアップファイルを選択してください。")}finally{input.value="";}};reader.readAsText(file);
+}
+function updateBackupStatus(){
+ const labels={sites:"現場",clients:"元請会社",partners:"協力会社",contacts:"担当者",employees:"社員",qualifications:"資格",vehicles:"車両",items:"購入物品",sales:"請求",lodgingPlaces:"宿泊先"};
+ $("backupStatus").innerHTML=Object.keys(labels).map(k=>`${labels[k]}：${state[k].length}件`).join("　／　");
+}
+
+// Age update
+$("employeeBirth").addEventListener("input",()=>{$("employeeAge").value=age($("employeeBirth").value);});
+$("employeeType").addEventListener("change",function(){toggleEmployeeCompany();updateEmployeePaymentCost();});
+$("employeeCompany").addEventListener("change",updateEmployeePaymentCost);
+$("employeeCostMode").addEventListener("change",updateEmployeePaymentCost);
+$("employeeSite").addEventListener("change",updateEmployeePaymentCost);
+$("employeeLodgingMode").addEventListener("change",toggleEmployeeLodgingMode);
+$("salesClient").addEventListener("change",updateSalesSiteOptions);
+
+
+function csvEscape(v){
+ const s=String(v??"");
+ return '"' + s.replace(/"/g,'""') + '"';
+}
+function downloadCsv(filename,headers,rowsData){
+ const lines=[headers.map(csvEscape).join(",")];
+ rowsData.forEach(r=>lines.push(r.map(csvEscape).join(",")));
+ const blob=new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download=filename;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function exportAll(){
+ try{
+ const stamp=new Date();
+ const ds=stamp.getFullYear()+String(stamp.getMonth()+1).padStart(2,"0")+String(stamp.getDate()).padStart(2,"0");
+ const rows=[];
+ const add=(title,headers,data)=>{
+   rows.push([title]);
+   rows.push(headers);
+   data.forEach(r=>rows.push(r));
+   rows.push([]);
+ };
+ add("現場一覧",["現場名","工事番号","元請会社","担当者","作業員人数","区分","地元単価","出張単価","基準宿泊費","宿泊対象人数","1日人件費","協力会社支払い","宿泊費合計","1日＋宿泊合計"],
+   state.sites.map(x=>[x.name,x.no,x.client,x.contact,siteCostSummary(x).count,x.rateType==="travel"?"出張":"地元",x.localRate||0,x.travelRate||0,x.lodgingCost||0,siteCostSummary(x).lodgingPeople,siteCostSummary(x).workCost,siteCostSummary(x).partnerPaymentTotal,siteCostSummary(x).lodgingTotal,siteCostSummary(x).total]));
+ add("元請会社",["会社名","電話番号","住所","メール"],
+   state.clients.map(x=>[x.name,x.phone,x.address,x.email]));
+ add("協力会社",["会社名","電話番号","住所","メール","主な業種","地元支払い経費","出張支払い経費"],
+   state.partners.map(x=>[x.name,x.phone,x.address,x.email,x.work,x.localCost||0,x.travelCost||0]));
+ add("担当者",["担当者名","電話番号","メール","備考"],
+   state.contacts.map(x=>[x.name,x.phone,x.email,x.memo]));
+ add("社員名簿",["区分","所属会社","氏名","ふりがな","現場名","支払い経費","設定","生年月日（西暦）","生年月日（和暦・年）","年齢","宿泊","宿泊先","県","資格有効期限","備考"],
+   state.employees.map(x=>[x.type,x.company,x.name,x.furigana||"",x.site||"",getEmployeePaymentCost(x, state.sites.find(s=>s.name===x.site)),x.costMode==="individual"?"個別設定":"会社設定",x.birth,wareki(x.birth),age(x.birth),x.stay||"なし",x.lodgingPlace||"",getPrefecture(x.address),Object.entries(x.qualificationExpiry||{}).map(([k,v])=>k+"："+v).join("、"),x.memo]));
+ add("資格・免許",["資格・免許名","区分"],
+   state.qualifications.map(x=>[x.name,x.type]));
+ add("車両",["車両名","ナンバー","車検","任意保険","整備履歴","修理・維持費","備考"],
+   state.vehicles.map(x=>[x.name,x.number,x.inspection,x.insurance,x.service,x.cost,x.memo]));
+ add("購入物品",["品名","個数","金額","現場名","購入日","備考"],
+   state.items.map(x=>[x.name,x.qty,x.amount,x.site,x.date,x.memo]));
+ add("請求",["元請会社","現場名","請求額","請求日","経費","利益","備考"],
+   state.sales.map(x=>[x.client||"",x.site,x.amount,x.date,x.expense,Number(x.amount||0)-Number(x.expense||0),x.memo||""]));
+ downloadCsv(`宝来工業_全データ一括_${ds}.csv`,[],rows);
+ alert("全データを1つのCSVファイルにまとめて出力しました。");
+ }catch(e){
+   console.error(e);
+   alert("一括出力でエラーが発生しました。もう一度お試しください。");
+ }
+}
+
+function exportCsv(kind){
+ const stamp=new Date();
+ const ds=stamp.getFullYear()+String(stamp.getMonth()+1).padStart(2,"0")+String(stamp.getDate()).padStart(2,"0");
+ if(kind==="sites"){
+   downloadCsv(`宝来工業_現場一覧_${ds}.csv`,
+     ["現場名","工事番号","元請会社","担当者","作業員人数","地元単価","出張単価","宿泊費"],
+     state.sites.map(x=>[x.name,x.no,x.client,x.contact,workerCount(x.workers),x.localRate||0,x.travelRate||0,x.lodgingCost||0]));
+ }else if(kind==="employees"){
+   downloadCsv(`宝来工業_社員名簿_${ds}.csv`,
+     ["区分","所属会社","氏名","生年月日","年齢","住所","資格・免許","備考"],
+     state.employees.map(x=>[x.type,x.company,x.name,x.birth,age(x.birth),(x.address||""),(x.qualifications||[]).join("、"),x.memo]));
+ }else if(kind==="partners"){
+   downloadCsv(`宝来工業_協力会社_${ds}.csv`,
+     ["会社名","電話番号","住所","メール","主な業種","地元支払い経費","出張支払い経費"],
+     state.partners.map(x=>[x.name,x.phone,x.address,x.email,x.work,x.localCost||0,x.travelCost||0]));
+ }else if(kind==="clients"){
+   downloadCsv(`宝来工業_元請会社_${ds}.csv`,
+     ["会社名","電話番号","住所","メール"],
+     state.clients.map(x=>[x.name,x.phone,x.address,x.email]));
+ }else if(kind==="contacts"){
+   downloadCsv(`宝来工業_担当者_${ds}.csv`,
+     ["担当者名","電話番号","メール","備考"],
+     state.contacts.map(x=>[x.name,x.phone,x.email,x.memo]));
+ }else if(kind==="qualifications"){
+   downloadCsv(`宝来工業_資格一覧_${ds}.csv`,
+     ["資格・免許名","区分"],
+     state.qualifications.map(x=>[x.name,x.type]));
+ }else if(kind==="vehicles"){
+   downloadCsv(`宝来工業_車両一覧_${ds}.csv`,
+     ["車両名","ナンバー","車検","任意保険","整備履歴","修理・維持費","備考"],
+     state.vehicles.map(x=>[x.name,x.number,x.inspection,x.insurance,x.service,x.cost,x.memo]));
+ }else if(kind==="items"){
+   downloadCsv(`宝来工業_購入物品_${ds}.csv`,
+     ["品名","個数","金額","現場名","購入日","備考"],
+     state.items.map(x=>[x.name,x.qty,x.amount,x.site,x.date,x.memo]));
+ }else if(kind==="sales"){
+   downloadCsv(`宝来工業_請求_${ds}.csv`,
+     ["現場名","請求額","請求日","経費","利益","備考"],
+     state.sales.map(x=>[x.site,x.amount,x.date,x.expense,Number(x.amount||0)-Number(x.expense||0),x.memo||""]));
+ }
+}
+
+
+function homeDetail(kind){
+ const title=$("homeDetailTitle"),body=$("homeDetailBody");
+ let rows=[],headers=[];
+ if(kind==="employees"){
+   title.innerText="全作業員の詳細";
+   headers=["区分","所属会社","氏名","ふりがな","現場名","生年月日","和暦","年齢","宿泊","県"];
+   rows=sortByField(state.employees,"name").map(x=>[x.type,x.company,x.name,x.furigana||"",x.site||"",x.birth,wareki(x.birth),age(x.birth),x.stay||"なし",getPrefecture(x.address)]);
+ }else if(kind==="ownEmployees"){
+   title.innerText="自社社員の詳細";
+   headers=["氏名","生年月日","和暦","年齢","宿泊"];
+   rows=state.employees.filter(x=>x.type==="自社社員").slice().sort((a,b)=>jaSort(a.name,b.name)).map(x=>[x.name,x.birth,wareki(x.birth),age(x.birth),x.stay||"なし"]);
+ }else if(kind==="partnerEmployees"){
+   title.innerText="協力会社社員の詳細";
+   headers=["所属会社","氏名","生年月日","和暦","年齢","宿泊"];
+   rows=state.employees.filter(x=>x.type==="協力会社社員").slice().sort((a,b)=>jaSort(a.name,b.name)).map(x=>[x.company,x.name,x.birth,wareki(x.birth),age(x.birth),x.stay||"なし"]);
+ }else if(kind==="sites"){
+   title.innerText="現場の詳細";
+   headers=["現場名","工事番号","元請会社","担当者","作業員人数","区分","地元単価","出張単価","基準宿泊費","宿泊対象人数","1日人件費","協力会社支払い","宿泊費合計","1日＋宿泊合計"];
+   rows=sortByField(state.sites,"name").map(x=>{const c=siteCostSummary(x);return [x.name,x.no,x.client,x.contact,c.count+"人",x.rateType==="travel"?"出張":"地元",yen(c.local),yen(c.travel),yen(c.lodging),c.lodgingPeople+"人",yen(c.workCost),yen(c.partnerPaymentTotal),yen(c.lodgingTotal),yen(c.total)];});
+ }else if(kind==="vehicles"){
+   title.innerText="車両の詳細";
+   headers=["車両名","ナンバー","車検","任意保険"];
+   rows=sortByField(state.vehicles,"name").map(x=>[x.name,x.number,x.inspection,x.insurance]);
+ }else if(kind==="sales"){
+   const ym=new Date().toISOString().slice(0,7);
+   title.innerText="今月請求額の詳細";
+   headers=["現場名","請求額","請求日","経費","利益"];
+   rows=state.sales.filter(x=>String(x.date||"").startsWith(ym)).map(x=>[x.site,yen(x.amount),x.date,yen(x.expense),yen(Number(x.amount||0)-Number(x.expense||0))]);
+ }else if(kind==="expenses"){
+   const ym=new Date().toISOString().slice(0,7);
+   title.innerText="今月経費の詳細";
+   headers=["現場名","経費","日付"];
+   rows=state.sales.filter(x=>String(x.date||"").startsWith(ym)).map(x=>[x.site,yen(x.expense),x.date]);
+ }else if(kind==="profit"){
+   const ym=new Date().toISOString().slice(0,7);
+   title.innerText="今月利益の詳細";
+   headers=["現場名","請求額","経費","利益","日付"];
+   rows=state.sales.filter(x=>String(x.date||"").startsWith(ym)).map(x=>[x.site,yen(x.amount),yen(x.expense),yen(Number(x.amount||0)-Number(x.expense||0)),x.date]);
+ }
+ let h='<table><thead><tr>'+headers.map(x=>'<th>'+esc(x)+'</th>').join("")+'</tr></thead><tbody>';
+ if(rows.length) h+=rows.map(r=>'<tr>'+r.map(x=>'<td>'+esc(x)+'</td>').join("")+'</tr>').join("");
+ else h+='<tr><td colspan="'+headers.length+'" class="empty">該当するデータがありません。</td></tr>';
+ h+='</tbody></table>';
+ body.innerHTML=h;
+ $("homeDetailModal").classList.add("show");
+}
+function closeHomeDetail(){
+ $("homeDetailModal").classList.remove("show");
+}
+$("homeDetailModal").addEventListener("click",function(e){
+ if(e.target===this) closeHomeDetail();
+});
+document.addEventListener("keydown",function(e){
+ if(e.key==="Escape") closeHomeDetail();
+});
+
+
+
+function showEmployeeDetail(index){
+ const x=state.employees[index];
+ if(!x)return;
+ const qual=(x.qualifications||[]).map(q=>{
+   const d=(x.qualificationExpiry||{})[q];
+   return d ? `${q}（有効期限 ${d}）` : q;
+ });
+ const body=$("employeeDetailBody");
+ $("employeeDetailTitle").innerText=(x.name||"社員")+" の詳細";
+ body.innerHTML=`
+ <div class="card">
+   <div class="row">
+     <label>区分<input value="${esc(x.type||"")}" readonly></label>
+     <label>所属会社<input value="${esc(x.company||"")}" readonly></label>
+   </div>
+   <div class="row">
+     <label>ふりがな<input value="${esc(x.furigana||"")}" readonly></label>
+     <label>現場名<input value="${esc(x.site||"")}" readonly></label>
+     <label>宿泊<input value="${esc(x.stay||"なし")}" readonly></label>
+   </div>
+   <div class="row">
+     <label>生年月日（西暦）<input value="${esc(x.birth||"")}" readonly></label>
+     <label>和暦<input value="${esc(wareki(x.birth))}" readonly></label>
+   </div>
+   <div class="row">
+     <label>年齢<input value="${esc(age(x.birth))}" readonly></label>
+     <label>県<input value="${esc(getPrefecture(x.address))}" readonly></label>
+   </div>
+   <label>住所<input value="${esc(x.address||"")}" readonly></label>
+   <label>資格・免許<textarea readonly>${esc(qual.join("、"))}</textarea></label>
+   <label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label>
+ </div>`;
+ $("employeeDetailModal").classList.add("show");
+}
+function closeEmployeeDetail(){
+ $("employeeDetailModal").classList.remove("show");
+}
+$("employeeDetailModal").addEventListener("click",function(e){
+ if(e.target===this) closeEmployeeDetail();
+});
+
+
+
+function showPartnerDetail(index){
+ const x=state.partners[index];
+ if(!x)return;
+ const name=x.name||"";
+ const employees=state.employees.filter(e=>e.type==="協力会社社員" && String(e.company||"")===String(name)).slice().sort((a,b)=>jaSort(a.name,b.name));
+ const workerRows=employees.length
+  ? employees.map(e=>`<tr><td class="employee-name">${esc(e.name||"")}</td><td>${esc(e.furigana||"")}</td><td>${esc(e.site||"")}</td><td>${yen(getEmployeePaymentCost(e,state.sites.find(s=>s.name===e.site)))}</td><td>${e.costMode==="individual"?'<span class="individual-badge">個別設定</span>':'会社設定'}</td><td>${esc(e.stay||"なし")}</td></tr>`).join("")
+  : '<tr><td colspan="6" class="empty">この協力会社の社員は登録されていません。</td></tr>';
+ $("partnerDetailTitle").innerText=name+" の詳細";
+ $("partnerDetailBody").innerHTML=`<div class="card">
+ <div class="row"><label>会社名<input value="${esc(x.name||"")}" readonly></label><label>電話番号<input value="${esc(x.phone||"")}" readonly></label></div>
+ <label>住所<input value="${esc(x.address||"")}" readonly></label>
+ <div class="row"><label>メール<input value="${esc(x.email||"")}" readonly></label><label>主な業種・仕事内容<input value="${esc(x.work||"")}" readonly></label></div>
+ <div class="row"><label>地元支払い経費<input value="${esc(yen(x.localCost))}" readonly></label><label>出張支払い経費<input value="${esc(yen(x.travelCost))}" readonly></label></div>
+ <h4 style="margin:16px 0 8px">所属社員（${employees.length}人）</h4>
+ <div class="table-wrap"><table><thead><tr><th>氏名</th><th>ふりがな</th><th>現場名</th><th>支払い経費</th><th>設定</th><th>宿泊</th></tr></thead><tbody>${workerRows}</tbody></table></div>
+ </div>`;
+ $("partnerDetailModal").classList.add("show");
+}
+function closePartnerDetail(){ $("partnerDetailModal").classList.remove("show"); }
+$("partnerDetailModal").addEventListener("click",function(e){ if(e.target===this)closePartnerDetail(); });
+
+
+function detailField(label,value){
+ return `<label>${esc(label)}<input value="${esc(value??"")}" readonly></label>`;
+}
+function showListDetail(type,index){
+ let x=null,title="",html="";
+ if(type==="site"){x=state.sites[index];title="現場詳細";if(!x)return;const c=siteCostSummary(x);html=`<div class="card">${detailField("現場名",x.name)}<div class="row">${detailField("工事番号",x.no)}${detailField("元請会社",x.client)}</div><div class="row">${detailField("担当者",x.contact)}${detailField("現場区分",x.rateType==="travel"?"出張":"地元")}</div>${detailField("作業員",x.workers)}<div class="row">${detailField("地元単価",yen(x.localRate))}${detailField("出張単価",yen(x.travelRate))}</div><div class="row">${detailField("基準宿泊費",yen(x.lodgingCost))}${detailField("宿泊対象人数",c.lodgingPeople+"人")}</div>${detailField("1日人件費",yen(c.workCost))}${detailField("協力会社支払い",yen(c.partnerPaymentTotal))}${detailField("宿泊費合計",yen(c.lodgingTotal))}${detailField("合計",yen(c.total))}</div>`;}
+ else if(type==="client"){x=state.clients[index];title="元請会社詳細";if(!x)return;html=`<div class="card">${detailField("会社名",x.name)}${detailField("電話番号",x.phone)}${detailField("住所",x.address)}${detailField("メール",x.email)}</div>`;}
+ else if(type==="contact"){x=state.contacts[index];title="担当者詳細";if(!x)return;html=`<div class="card">${detailField("担当者名",x.name)}${detailField("電話番号",x.phone)}${detailField("メール",x.email)}<label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label></div>`;}
+ else if(type==="qualification"){x=state.qualifications[index];title="資格・免許詳細";if(!x)return;html=`<div class="card">${detailField("資格・免許名",x.name)}${detailField("区分",x.type)}</div>`;}
+ else if(type==="vehicle"){x=state.vehicles[index];title="車両詳細";if(!x)return;html=`<div class="card">${detailField("車両名",x.name)}${detailField("ナンバー",x.number)}<div class="row">${detailField("車検",x.inspection)}${detailField("任意保険",x.insurance)}</div>${detailField("修理・維持費",yen(x.cost))}<label>整備履歴<textarea readonly>${esc(x.service||"")}</textarea></label><label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label></div>`;}
+ else if(type==="item"){x=state.items[index];title="購入物品詳細";if(!x)return;html=`<div class="card">${detailField("品名",x.name)}<div class="row">${detailField("個数",x.qty)}${detailField("金額",yen(x.amount))}</div><div class="row">${detailField("現場名",x.site)}${detailField("購入日",x.date)}</div><label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label></div>`;}
+ else if(type==="lodgingPlace"){x=state.lodgingPlaces[index];title="宿泊先詳細";if(!x)return;html=`<div class="card">${detailField("宿泊先名",x.name)}${detailField("住所",x.address)}${detailField("電話番号",x.phone)}${detailField("宿泊経費",yen(x.cost))}<label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label></div>`;}
+ else if(type==="sales"){x=state.sales[index];title="請求詳細";if(!x)return;const p=Number(x.amount||0)-Number(x.expense||0),site=state.sites.find(s=>s.name===x.site);html=`<div class="card">${detailField("元請会社",x.client||(site?site.client:""))}${detailField("現場名",x.site)}<div class="row">${detailField("請求日",x.date)}${detailField("請求額",yen(x.amount))}</div><div class="row">${detailField("経費",yen(x.expense))}${detailField("利益",yen(p))}</div><label>備考<textarea readonly>${esc(x.memo||"")}</textarea></label></div>`;}
+ $("listDetailTitle").innerText=title;$("listDetailBody").innerHTML=html;$("listDetailModal").classList.add("show");
+}
+function closeListDetail(){ $("listDetailModal").classList.remove("show"); }
+$("listDetailModal").addEventListener("click",function(e){if(e.target===this)closeListDetail();});
+
+// Expose one clean public API used by all buttons.
+window.App={show,open,close,save,del,addDefaults,backup,restore,exportAll,exportCsv,homeDetail,closeHomeDetail,deleteFromForm,showEmployeeDetail,closeEmployeeDetail,searchQualificationOwners,clearQualificationOwnerSearch,updateSiteSearchOptions,applySiteSearch,clearSearch,updateSalesSearchOptions,applySalesSearch,showPartnerDetail,closePartnerDetail,showListDetail,closeListDetail};
+
+renderAll();
+fillPartners();fillSiteSelects();fillItemSites();fillSalesClients();fillSalesSitesForClient("");toggleEmployeeCompany();fillEmployeeLodgingPlaces();toggleEmployeeLodgingMode();fillQualificationOwnerOptions();bindQualificationOwnerSearch();renderQualificationOwners();
+})();
+
+(function installFormDeleteFallback(){
+  document.addEventListener("click",function(e){
+    const b=e.target && e.target.closest ? e.target.closest("button") : null;
+    if(!b || !b.id || !b.id.endsWith("FormDelete")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const type=b.id.replace(/FormDelete$/,"");
+    if(window.App && typeof window.App.deleteFromForm==="function"){
+      window.App.deleteFromForm(type);
+    }
+  },true);
+})();
+
+
+(function bindQualificationImmediateFilter(){
+ const e=document.getElementById("qualOwnerSearch");
+ if(!e)return;
+ const fn=function(){renderQualificationOwners();};
+ e.addEventListener("change",fn);
+ e.addEventListener("input",fn);
+})();
+
+
+(function installListDetailClickFallback(){
+ document.addEventListener("click",function(e){
+   if(e.target && e.target.closest && e.target.closest("button"))return;
+   const row=e.target && e.target.closest ? e.target.closest("tr[data-detail-type]") : null;
+   if(!row)return;
+   const type=row.getAttribute("data-detail-type");
+   const idx=Number(row.getAttribute("data-detail-index"));
+   if(window.App && typeof window.App.showListDetail==="function" && Number.isInteger(idx) && idx>=0){
+     window.App.showListDetail(type,idx);
+   }
+ },true);
+})();
+
+</script>
+<script>
+// 行クリック詳細表示の最終フォールバック：一覧のHTMLが再描画されても確実に動作させる
+(function(){
+  function openRowDetail(row){
+    if(!row) return false;
+    const type=row.getAttribute('data-detail-type');
+    const idx=row.getAttribute('data-detail-index');
+    if(type && idx!==null && window.App && typeof window.App.showListDetail==='function'){
+      window.App.showListDetail(type, Number(idx)); return true;
+    }
+    const emp=row.getAttribute('data-employee-index');
+    if(emp!==null && window.App && typeof window.App.showEmployeeDetail==='function'){
+      window.App.showEmployeeDetail(Number(emp)); return true;
+    }
+    const partner=row.getAttribute('data-partner-index');
+    if(partner!==null && window.App && typeof window.App.showPartnerDetail==='function'){
+      window.App.showPartnerDetail(Number(partner)); return true;
+    }
+    return false;
+  }
+  document.addEventListener('click',function(e){
+    if(e.target.closest('button,a,input,select,textarea')) return;
+    const row=e.target.closest('tbody tr');
+    if(!row) return;
+    openRowDetail(row);
+  },true);
+})();
+</script>
+</body>
+</html>
