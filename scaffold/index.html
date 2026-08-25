@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>単管足場 積算ソフト Ver.42</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--text:#222;--muted:#666;--line:#e7e7e7;--dark:#222;--warn:#fff8df;--ok:#eef8ee}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:var(--text)}
+header{background:var(--dark);color:#fff;padding:16px;font-size:20px;font-weight:700}
+main{max-width:980px;margin:auto;padding:14px}
+.card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:5px}
+small{display:block;color:var(--muted);line-height:1.4;margin-top:4px}
+input,select,button{width:100%;padding:11px;border:1px solid #bbb;border-radius:8px;font-size:16px;background:#fff}
+button{border:0;background:var(--dark);color:#fff;font-weight:700;cursor:pointer}
+button.sub{background:#666}
+.section-title{font-size:16px;font-weight:800;margin:20px 0 6px;padding-bottom:6px;border-bottom:2px solid #333}
+.row{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(70px,.8fr) minmax(70px,.8fr);gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.row.head{font-weight:800;background:#fafafa;padding-left:6px;padding-right:6px}
+.total{font-size:18px;font-weight:800;background:var(--ok);padding:10px;border-radius:8px;line-height:1.6}
+.note{font-size:13px;line-height:1.6;background:var(--warn);padding:12px;border-radius:8px;margin-bottom:14px}
+.badge{display:inline-block;background:#eee;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+.summary-note{font-size:13px;line-height:1.6;color:#555;margin-top:10px}.summary-title{font-size:18px;font-weight:800;margin-bottom:10px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1.6fr .7fr .7fr;font-size:14px}}
+@media print{button,.no-print{display:none!important}body{background:#fff}.card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}}
+.ponchi-wrap{overflow:auto;border:1px solid #ddd;border-radius:10px;background:#fff;padding:8px;-webkit-overflow-scrolling:touch;min-height:140px}
+.ponchi-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#555;margin-top:8px}
+.ponchi-legend span{display:inline-flex;align-items:center;gap:4px}
+.ponchi-dot{width:14px;height:3px;background:#333;display:inline-block}
+.detail-toggle{display:block;width:100%;margin-top:12px;padding:12px 14px;border:1px solid #d0d7de;border-radius:10px;background:#f7f9fb;font-weight:700;font-size:16px;text-align:left;-webkit-appearance:none;appearance:none}
+.detail-toggle:active{transform:scale(.998)}
+.detail-panel{display:none;margin-top:10px;border:1px solid #ddd;border-radius:10px;padding:10px;background:#fafafa}
+.detail-panel.open{display:block}
+.ponchi-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.ponchi-wrap canvas{max-width:none}
+@media(max-width:650px){.ponchi-wrap{padding:6px;min-height:220px}.ponchi-scroll{width:100%;overflow-x:auto}}
+.simple-summary .row{grid-template-columns:minmax(0,2.2fr) minmax(80px,.8fr) minmax(60px,.6fr)}
+</style>
+</head>
+<body>
+<header>単管足場 積算ソフト Ver.42</header>
+<main>
+<div class="card"><h2>① 足場条件</h2><div class="grid">
+<div><label>足場の長さ（m）</label><input id="length" type="number" value="4.0" min="0.1" step="0.1"><small>布方向（長手方向）の全長</small></div>
+<div><label>最上段の作業床高さ（m）</label><input id="height" type="number" value="2.0" min="0.1" step="0.1"><small>建地必要長さは「作業床高さ＋1.0m」で計算</small></div>
+<div><label>足場の幅（m）</label><input id="width" type="number" value="1.5" min="0.5" step="0.1"><small>腕木方向。1.5mを超える場合は2.0m以上の単管を選択</small></div>
+<div><label>建地の最大間隔（m）</label><input id="bay" type="number" value="1.8" min="0.5" max="1.8" step="0.1"><small>1.8m以下になるよう均等割り</small></div>
+<div><label>作業床</label><select id="floorMode"><option value="top" selected>最上段のみ</option><option value="all">各層に設置</option></select></div>
+<div><label>昇降口</label><select id="access"><option value="yes" selected>1箇所あり</option><option value="no">なし</option></select></div>
+<div><label>昇降口の位置（左端から何スパン目）</label><input id="accessSpan" type="number" value="1" min="1" step="1"><small>例：1なら左端から1スパン目。計算後に実際の範囲を表示します。</small></div>
+<div><label>踊り場の長さ（m）</label><select id="landingLength"><option value="1.0" selected>1.0m</option><option value="1.5">1.5m</option></select><small>高さ3.5m以上で踊り場が必要な場合に使用</small></div>
+<div><label>昇降梯子</label><select id="ladderType"><option value="auto" selected>自動選定</option><option value="3m">3.0m アルミシングル</option><option value="1.8m">1.8m 垂直梯子</option><option value="5m">5.0m スライド梯子</option></select><small>自動選定では高さに応じて必要本数を算出します。</small></div>
+</div><br><button onclick="calc()">部材数量を計算</button></div>
+<div class="card"><h2>② 計算結果</h2><div id="result">条件を入力して「部材数量を計算」を押してください。</div></div>
+<div class="card"><h2>③ 部材別 合計数量</h2><div id="totalResult">「部材数量を計算」を押すと、部材ごとの合計数量を表示します。</div></div>
+<div class="card"><h2>④ ポンチ絵（斜め表示）</h2><div id="ponchiResult" class="ponchi-wrap">「部材数量を計算」を押すとポンチ絵を表示します。</div><div class="ponchi-legend"><span><i class="ponchi-dot"></i>建地・布・腕木</span><span>／ 作業床・手すり・中さん・筋交い・昇降口・寸法を計算値から描画</span></div></div>
+<div class="card"><h2>⑤ 保存・印刷</h2><div class="grid"><button onclick="saveData()">入力内容を保存</button><button class="sub" onclick="window.print()">印刷</button></div><p id="saved" style="font-size:13px"></p></div>
+<div class="note"><strong>Ver.42で反映した範囲：</strong>建地、布、腕木、手すり・中さん、幅木、昇降口、筋交い、クランプの基本数量。<br><strong>現在：</strong>主要部材の基本積算まで反映。壁つなぎは使用しない仕様です。</div>
+<div class="note"><strong>重要：</strong>このソフトは材料拾い・概算用です。実際の設計・施工では、関係法令、現場条件、構造条件、メーカー仕様、資格者・責任者による確認を優先してください。</div>
+</main>
+<script src="./app1.js"></script>
+<script src="./app2.js"></script>
+<script src="./app3.js"></script>
+<script src="./app4.js"></script>
+</body></html>
